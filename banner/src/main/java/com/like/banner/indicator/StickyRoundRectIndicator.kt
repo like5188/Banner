@@ -55,10 +55,8 @@ class StickyRoundRectIndicator(
             require(mSelectedColors.isNotEmpty()) { "mSelectedColors 不能为空" }
 
             // 设置本控制器的宽高
-            val containerHeight =
-                mContainer.height - mContainer.paddingTop - mContainer.paddingBottom
-            val w =
-                mIndicatorWidthPx * mDataCount + mIndicatorPaddingPx * mDataCount// 左右各留 mIndicatorPaddingPx/2 的位置，用于显示过渡动画
+            val containerHeight = mContainer.height - mContainer.paddingTop - mContainer.paddingBottom
+            val w = mIndicatorWidthPx * mDataCount + mIndicatorPaddingPx * mDataCount// 左右各留 mIndicatorPaddingPx/2 的位置，用于显示过渡动画
             this.layoutParams = ViewGroup.LayoutParams(w, containerHeight)
 
             // 确定不随滚动而改变的

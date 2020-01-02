@@ -61,8 +61,7 @@ class ImageIndicator(
 
     override fun onPageSelected(position: Int) {
         if (mDataCount <= 0) return
-        mContainer.getChildAt(mPreSelectedPosition)
-            .setBackgroundResource(getNormalIndicatorResId(mPreSelectedPosition))
+        mContainer.getChildAt(mPreSelectedPosition).setBackgroundResource(getNormalIndicatorResId(mPreSelectedPosition))
         mContainer.getChildAt(position).setBackgroundResource(getSelectedIndicatorResId(position))
         mPreSelectedPosition = position
     }

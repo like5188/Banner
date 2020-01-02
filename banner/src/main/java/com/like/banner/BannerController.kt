@@ -1,12 +1,12 @@
 package com.like.banner
 
 import android.os.Handler
+import android.util.Log
 import androidx.viewpager.widget.ViewPager
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * 通过 [BannerViewPager]、[BannerPagerAdapter] 控制 Banner 进行无限轮播
- * 原理：当数据量大于1时，在数据的前后两端各添加一条数据。前端添加的是最后一条数据，尾端添加的是第一条数据。
  */
 class BannerController {
     /**
@@ -14,31 +14,27 @@ class BannerController {
      */
     private val mIsAutoPlaying = AtomicBoolean(false)
     /**
+     * 真实的数据条数
+     */
+    private var mRealCount = 0
+    /**
      * ViewPager的当前位置
      */
-    private var mCurPosition = 1
-    /**
-     * Adapter 中的实际数据数量
-     */
-    private var mAdapterCount = 0
-    private var mViewPager: BannerViewPager? = null
+    private var mCurPosition = Int.MAX_VALUE / 2
     /**
      * 循环的时间间隔，毫秒。如果<=0，表示不循环播放。默认3000L
      */
     private var mCycleInterval: Long = 3000L
 
+    private var mViewPager: BannerViewPager? = null
+
     private val mCycleHandler: Handler by lazy {
         Handler {
-            if (mIsAutoPlaying.get() && mCycleInterval > 0 && mAdapterCount > 1) {
+            if (mIsAutoPlaying.get() && mCycleInterval > 0 && mRealCount > 1) {
                 mViewPager?.let {
-                    mCurPosition = mCurPosition % (mAdapterCount - 1) + 1
-                    if (mCurPosition == 1) {
-                        it.setCurrentItem(mCurPosition, false)
-                        mCycleHandler.sendEmptyMessage(0)
-                    } else {
-                        it.setCurrentItem(mCurPosition, true)
-                        mCycleHandler.sendEmptyMessageDelayed(0, mCycleInterval)
-                    }
+                    mCurPosition++
+                    it.setCurrentItem(mCurPosition, true)
+                    mCycleHandler.sendEmptyMessageDelayed(0, mCycleInterval)
                 }
             }
             true
@@ -48,6 +44,7 @@ class BannerController {
     private val mOnPageChangeListener = object : ViewPager.OnPageChangeListener {
         // position当前选择的是哪个页面。注意：如果mCount=1，那么默认会显示第0页，此时不会触发此方法，只会触发onPageScrolled方法。
         override fun onPageSelected(position: Int) {
+            Log.d("tag", "onPageSelected")
             mCurPosition = position
         }
 
@@ -57,19 +54,14 @@ class BannerController {
             positionOffset: Float,
             positionOffsetPixels: Int
         ) {
+            Log.i("tag", "onPageScrolled")
         }
 
         override fun onPageScrollStateChanged(state: Int) {
+            Log.w("tag", "onPageScrollStateChanged")
             when (state) {
                 ViewPager.SCROLL_STATE_IDLE -> {// 页面停止在了某页，有可能是手指滑动一页结束，有可能是自动滑动一页结束，开始自动播放。
-                    mViewPager?.let {
-                        if (mCurPosition == 0) {
-                            it.setCurrentItem(mAdapterCount - 2, false)
-                        } else if (mCurPosition == mAdapterCount - 1) {
-                            it.setCurrentItem(1, false)
-                        }
-                        play()
-                    }
+                    play()
                 }
                 ViewPager.SCROLL_STATE_DRAGGING -> {// 手指按下开始滑动，停止自动播放。
                     pause()
@@ -90,24 +82,20 @@ class BannerController {
      */
     fun setViewPager(viewPager: BannerViewPager): BannerController {
         val adapter = viewPager.adapter
-            ?: throw IllegalArgumentException("ViewPager does not have adapter instance.")
         require(adapter is BannerPagerAdapter) { "adapter of viewPager must be com.like.banner.BannerPagerAdapter" }
+        mRealCount = adapter.getRealCount()
         mViewPager = viewPager
-        mAdapterCount = adapter.count
-        if (mAdapterCount > 0) {
-            viewPager.addOnPageChangeListener(mOnPageChangeListener)
-
-            when (mAdapterCount) {
-                1 -> { // 如果只有一个页面，就限制 ViewPager 不能手动滑动
-                    viewPager.setScrollable(false)// 如果不设置，那么即使viewpager在只有一个页面时不能滑动，但是还是会触发onPageScrolled、onPageScrollStateChanged方法
-//                mViewPager.currentItem = 0// 不用调用，默认会显示第0页
-                }
-                else -> {
-                    viewPager.setScrollable(true)
-                    // 因为页面变化，所以setCurrentItem方法能触发onPageSelected、onPageScrolled方法，
-                    // 但是不能触发 onPageScrollStateChanged，所以不会启动自动播放，由使用者手动开启自动播放
-                    viewPager.setCurrentItem(1, false)
-                }
+        when {
+            mRealCount == 1 -> { // 如果只有一个页面，就限制 ViewPager 不能手动滑动
+                viewPager.setScrollable(false)// 如果不设置，那么即使viewpager在只有一个页面时不能滑动，但是还是会触发onPageScrolled、onPageScrollStateChanged方法
+            }
+            mRealCount > 1 -> {
+                viewPager.setScrollable(true)
+                viewPager.addOnPageChangeListener(mOnPageChangeListener)
+                // 因为页面变化，所以setCurrentItem方法能触发onPageSelected、onPageScrolled方法，
+                // 但是不能触发 onPageScrollStateChanged，所以不会启动自动播放，由使用者手动开启自动播放
+                mCurPosition -= mCurPosition % mRealCount// 取余处理，避免默认值不能被 mDataCount 整除
+                viewPager.currentItem = mCurPosition
             }
         }
         return this
@@ -115,7 +103,7 @@ class BannerController {
 
     fun play() {
         if (mCycleInterval <= 0) return
-        if (mAdapterCount <= 1) return
+        if (mRealCount <= 1) return
         if (mIsAutoPlaying.compareAndSet(false, true)) {
             mCycleHandler.removeCallbacksAndMessages(null)
             mCycleHandler.sendEmptyMessageDelayed(0, mCycleInterval)

@@ -1,23 +1,17 @@
 package com.like.banner.sample
 
-import android.animation.ArgbEvaluator
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.WindowManager
-import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.palette.graphics.Target
-import androidx.viewpager.widget.ViewPager
 import com.like.banner.BannerController
 import com.like.banner.BannerPagerAdapter
 import com.like.banner.indicator.IBannerIndicator
 import com.like.banner.indicator.StickyRoundRectIndicator
 import com.like.banner.sample.databinding.ActivityMainBinding
-import com.like.common.util.ImageUtils
 import com.like.common.util.onPreDrawListener
 import com.like.common.view.viewPagerTransformer.RotateYTransformer
 import java.util.*
@@ -62,44 +56,40 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        mBinding.vp.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            private val argbEvaluator = ArgbEvaluator()
-
-            override fun onPageScrollStateChanged(state: Int) {
-            }
-
-            // position表示目标位置，positionOffset表示偏移的百分比，positionOffsetPixels表示偏移的像素
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int
-            ) {
-                val iv0 = mBinding.vp.getChildAt(adapter.getRealPosition(position))
-                    .findViewById<ImageView>(R.id.iv)
-                val iv1 = mBinding.vp.getChildAt(adapter.getRealPosition(position + 1))
-                    .findViewById<ImageView>(R.id.iv)
-                if (iv0 != null && iv0.drawable != null && iv1 != null && iv1.drawable != null) {
-                    val color0 = ImageUtils.getColor(iv0.drawable, Target.DARK_MUTED, 0x000000)
-                    val color1 = ImageUtils.getColor(iv1.drawable, Target.DARK_MUTED, 0x000000)
-                    Log.e(
-                        "tag",
-                        "drawable0=${iv0.drawable} color0=$color0 drawable1=${iv1.drawable} color1=$color1"
-                    )
-                    mBinding.root.setBackgroundColor(
-                        argbEvaluator.evaluate(positionOffset, color0, color1).toString().toInt()
-                    )
-                }
-            }
-
-            override fun onPageSelected(position: Int) {
-            }
-
-        })
+//        mBinding.vp.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+//            private val argbEvaluator = ArgbEvaluator()
+//
+//            override fun onPageScrollStateChanged(state: Int) {
+//            }
+//
+//            // position表示目标位置，positionOffset表示偏移的百分比，positionOffsetPixels表示偏移的像素
+//            override fun onPageScrolled(
+//                position: Int,
+//                positionOffset: Float,
+//                positionOffsetPixels: Int
+//            ) {
+//                val iv0 = mBinding.vp.getChildAt(adapter.getRealPosition(position))
+//                    .findViewById<ImageView>(R.id.iv)
+//                val iv1 = mBinding.vp.getChildAt(adapter.getRealPosition(position + 1))
+//                    .findViewById<ImageView>(R.id.iv)
+//                if (iv0 != null && iv0.drawable != null && iv1 != null && iv1.drawable != null) {
+//                    val color0 = ImageUtils.getColor(iv0.drawable, androidx.palette.graphics.Target.DARK_MUTED, 0x000000)
+//                    val color1 = ImageUtils.getColor(iv1.drawable, androidx.palette.graphics.Target.DARK_MUTED, 0x000000)
+//                    mBinding.root.setBackgroundColor(
+//                        argbEvaluator.evaluate(positionOffset, color0, color1).toString().toInt()
+//                    )
+//                }
+//            }
+//
+//            override fun onPageSelected(position: Int) {
+//            }
+//
+//        })
 
         mBinding.vp.onPreDrawListener {
             it.layoutParams.height = (it.width * 0.4f).toInt()// vp 的高度是宽度的 0.4
 
-//            val indicator: IBannerIndicator = TextIndicator(this, data.size, indicatorContainer).apply {
+            //            val indicator: IBannerIndicator = TextIndicator(this, data.size, indicatorContainer).apply {
 //                setTextSize(12f)
 //                setTextColor(Color.WHITE)
 //                setBackgroundColor(Color.GRAY)
@@ -114,12 +104,11 @@ class MainActivity : AppCompatActivity() {
                 )
             )
             indicator.setViewPager(mBinding.vp)
-
-            mBannerController.setViewPager(mBinding.vp)
-                .setCycleInterval(3000L)
-                .play()
         }
 
+        mBannerController.setViewPager(mBinding.vp)
+            .setCycleInterval(3000L)
+            .play()
     }
 
     override fun onResume() {
