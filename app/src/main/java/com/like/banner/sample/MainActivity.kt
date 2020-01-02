@@ -7,7 +7,7 @@ import androidx.databinding.DataBindingUtil
 import com.like.banner.BannerController
 import com.like.banner.BannerPagerAdapter
 import com.like.banner.indicator.IBannerIndicator
-import com.like.banner.indicator.StickyRoundRectIndicator
+import com.like.banner.indicator.StickyDotBezierCurveIndicator
 import com.like.banner.sample.databinding.ActivityMainBinding
 import com.ocnyang.pagetransformerhelp.transformer.ParallaxTransformer
 import java.util.*
@@ -38,20 +38,35 @@ class MainActivity : AppCompatActivity() {
         mBinding.vp.setPageTransformer(true, ParallaxTransformer())
 
         // 设置指示器
-        //            val indicator: IBannerIndicator = TextIndicator(this, data.size, indicatorContainer).apply {
-//                setTextSize(12f)
-//                setTextColor(Color.WHITE)
-//                setBackgroundColor(Color.GRAY)
-//            }
-//            val indicator: IBannerIndicator = ImageIndicator(this, data.size, indicatorContainer, 10f, listOf(R.drawable.store_point2), listOf(R.drawable.store_point1))
-//            val indicator: IBannerIndicator = StickyDotBezierCurveIndicator(this, data.size, indicatorContainer, 20f, Color.GRAY, listOf(Color.parseColor("#ff4a42"), Color.parseColor("#fcde64"), Color.parseColor("#73e8f4")))
-        val indicator: IBannerIndicator = StickyRoundRectIndicator(
-            this, data.size, mBinding.indicatorContainer, 20f, 10f, Color.GRAY, listOf(
-                Color.parseColor("#ff4a42"),
-                Color.parseColor("#fcde64"),
-                Color.parseColor("#73e8f4")
-            )
+//        val indicator: IBannerIndicator = TextIndicator(this, data.size, mBinding.indicatorContainer).apply {
+//            setTextSize(12f)
+//            setTextColor(Color.WHITE)
+//            setBackgroundColor(Color.GRAY)
+//        }
+//        val indicator: IBannerIndicator = ImageIndicator(
+//            this,
+//            data.size,
+//            mBinding.indicatorContainer,
+//            10f,
+//            listOf(R.drawable.store_point2),
+//            listOf(R.drawable.store_point1)
+//        )
+        val indicator: IBannerIndicator = StickyDotBezierCurveIndicator(
+            this,
+            data.size,
+            mBinding.indicatorContainer,
+            20f,
+            Color.GRAY,
+            listOf(Color.parseColor("#ff4a42"), Color.parseColor("#fcde64"), Color.parseColor("#73e8f4"))
         )
+//        val indicator: IBannerIndicator = StickyRoundRectIndicator(
+//            this, data.size, mBinding.indicatorContainer, 20f, 10f, Color.GRAY, listOf(
+//                Color.parseColor("#ff4a42"),
+//                Color.parseColor("#fcde64"),
+//                Color.parseColor("#73e8f4")
+//            )
+//        )
+        indicator.setIndicatorHeight(20f)
         indicator.setViewPager(mBinding.vp)
 
         // 设置轮播控制器

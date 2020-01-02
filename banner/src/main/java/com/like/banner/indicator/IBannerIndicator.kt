@@ -42,6 +42,11 @@ interface IBannerIndicator {
         }
     }
 
+    /**
+     * 设置指示器的高度。dp
+     */
+    fun setIndicatorHeight(height: Float)
+
     fun onPageScrollStateChanged(state: Int) {}
 
     fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}

@@ -7,9 +7,9 @@ import android.graphics.Paint
 import android.graphics.PaintFlagsDrawFilter
 import android.view.Gravity
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import androidx.annotation.ColorInt
 import androidx.appcompat.widget.AppCompatTextView
+import com.like.banner.utils.DimensionUtils
 
 /**
  * 文本指示器
@@ -28,21 +28,13 @@ class TextIndicator(
         gravity = Gravity.CENTER
     }
 
-    init {
-        if (mDataCount > 0) {
-            mContainer.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
-                override fun onPreDraw(): Boolean {
-                    mContainer.viewTreeObserver.removeOnPreDrawListener(this)
-                    // 设置CircleTextView的宽高
-                    val containerHeight = mContainer.height - mContainer.paddingTop - mContainer.paddingBottom
-                    mCircleTextView.layoutParams = ViewGroup.LayoutParams(containerHeight, containerHeight)
+    override fun setIndicatorHeight(height: Float) {
+        val indicatorHeight = DimensionUtils.dp2px(mContext, height)
+        // 设置CircleTextView的宽高
+        mCircleTextView.layoutParams = ViewGroup.LayoutParams(indicatorHeight, indicatorHeight)
 
-                    mContainer.removeAllViews()
-                    mContainer.addView(mCircleTextView)
-                    return true
-                }
-            })
-        }
+        mContainer.removeAllViews()
+        mContainer.addView(mCircleTextView)
     }
 
     fun setTextColor(@ColorInt color: Int) {

@@ -8,7 +8,6 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import com.like.banner.utils.DimensionUtils
@@ -51,42 +50,36 @@ class StickyRoundRectIndicator(
     private val mArgbEvaluator = ArgbEvaluator()
 
     init {
-        if (mDataCount > 0) {
-            require(mIndicatorPaddingPx > 0) { "indicatorPadding 必须大于0" }
-            require(mSelectedColors.isNotEmpty()) { "mSelectedColors 不能为空" }
+        require(mIndicatorPaddingPx > 0) { "indicatorPadding 必须大于0" }
+        require(mSelectedColors.isNotEmpty()) { "mSelectedColors 不能为空" }
+    }
 
-            mContainer.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
-                override fun onPreDraw(): Boolean {
-                    mContainer.viewTreeObserver.removeOnPreDrawListener(this)
-                    // 设置本控制器的宽高
-                    val containerHeight = mContainer.height - mContainer.paddingTop - mContainer.paddingBottom
-                    val w = mIndicatorWidthPx * mDataCount + mIndicatorPaddingPx * mDataCount// 左右各留 mIndicatorPaddingPx/2 的位置，用于显示过渡动画
-                    this@StickyRoundRectIndicator.layoutParams = ViewGroup.LayoutParams(w, containerHeight)
+    override fun setIndicatorHeight(height: Float) {
+        val indicatorHeight = DimensionUtils.dp2px(mContext, height)
+        // 设置本控制器的宽高
+        val w = mIndicatorWidthPx * mDataCount + mIndicatorPaddingPx * mDataCount// 左右各留 mIndicatorPaddingPx/2 的位置，用于显示过渡动画
+        this@StickyRoundRectIndicator.layoutParams = ViewGroup.LayoutParams(w, indicatorHeight)
 
-                    // 确定不随滚动而改变的
-                    mTransitionalRect1.top = 0f
-                    mTransitionalRect1.bottom = containerHeight.toFloat()
-                    mTransitionalRect2.top = 0f
-                    mTransitionalRect2.bottom = containerHeight.toFloat()
+        // 确定不随滚动而改变的
+        mTransitionalRect1.top = 0f
+        mTransitionalRect1.bottom = height.toFloat()
+        mTransitionalRect2.top = 0f
+        mTransitionalRect2.bottom = height.toFloat()
 
-                    // 计算所有占位矩形
-                    var startLeft = left + mIndicatorPaddingPx / 2f
-                    for (i in 0 until mDataCount) {
-                        val rect = RectF()
-                        rect.left = startLeft
-                        rect.top = 0f
-                        rect.right = startLeft + mIndicatorWidthPx
-                        rect.bottom = containerHeight.toFloat()
-                        mPositions.add(rect)
-                        startLeft = rect.right + mIndicatorPaddingPx
-                    }
-
-                    mContainer.removeAllViews()
-                    mContainer.addView(this@StickyRoundRectIndicator)
-                    return true
-                }
-            })
+        // 计算所有占位矩形
+        var startLeft = left + mIndicatorPaddingPx / 2f
+        for (i in 0 until mDataCount) {
+            val rect = RectF()
+            rect.left = startLeft
+            rect.top = 0f
+            rect.right = startLeft + mIndicatorWidthPx
+            rect.bottom = height.toFloat()
+            mPositions.add(rect)
+            startLeft = rect.right + mIndicatorPaddingPx
         }
+
+        mContainer.removeAllViews()
+        mContainer.addView(this@StickyRoundRectIndicator)
     }
 
     override fun onDraw(canvas: Canvas) {

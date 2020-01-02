@@ -1,7 +1,6 @@
 package com.like.banner.indicator
 
 import android.content.Context
-import android.view.ViewTreeObserver
 import android.widget.ImageView
 import android.widget.LinearLayout
 import com.like.banner.utils.DimensionUtils
@@ -29,40 +28,34 @@ class ImageIndicator(
     private val mIndicatorPaddingPx: Int = DimensionUtils.dp2px(mContext, indicatorPadding)
 
     init {
-        if (mDataCount > 0) {
-            require(mIndicatorPaddingPx > 0) { "indicatorPadding 必须大于0" }
-            require(mNormalIndicatorResIds.isNotEmpty()) { "mNormalIndicatorResIds 不能为空" }
-            mNormalIndicatorResIds.forEach {
-                require(it > 0) { "mNormalIndicatorResIds 中的图片资源 id 无效" }
-            }
-            require(mSelectedIndicatorResIds.isNotEmpty()) { "mSelectedIndicatorResIds 不能为空" }
-            mSelectedIndicatorResIds.forEach {
-                require(it > 0) { "mSelectedIndicatorResIds 中的图片资源 id 无效" }
-            }
+        require(mIndicatorPaddingPx > 0) { "indicatorPadding 必须大于0" }
+        require(mNormalIndicatorResIds.isNotEmpty()) { "mNormalIndicatorResIds 不能为空" }
+        mNormalIndicatorResIds.forEach {
+            require(it > 0) { "mNormalIndicatorResIds 中的图片资源 id 无效" }
+        }
+        require(mSelectedIndicatorResIds.isNotEmpty()) { "mSelectedIndicatorResIds 不能为空" }
+        mSelectedIndicatorResIds.forEach {
+            require(it > 0) { "mSelectedIndicatorResIds 中的图片资源 id 无效" }
+        }
+    }
 
-            mContainer.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
-                override fun onPreDraw(): Boolean {
-                    mContainer.viewTreeObserver.removeOnPreDrawListener(this)
-                    val containerHeight = mContainer.height - mContainer.paddingTop - mContainer.paddingBottom
-                    mContainer.removeAllViews()
-                    for (i in 0 until mDataCount) {
-                        // 加载指示器图片
-                        val params = LinearLayout.LayoutParams(containerHeight, containerHeight)// 设置指示器宽高
-                        val iv = ImageView(mContext)
-                        iv.scaleType = ImageView.ScaleType.FIT_CENTER
-                        if (i == 0) {
-                            iv.setBackgroundResource(getSelectedIndicatorResId(i))
-                            params.setMargins(0, 0, 0, 0)// 设置指示器边距
-                        } else {
-                            iv.setBackgroundResource(getNormalIndicatorResId(i))
-                            params.setMargins(mIndicatorPaddingPx, 0, 0, 0)// 设置指示器边距
-                        }
-                        iv.layoutParams = params
-                        mContainer.addView(iv)
-                    }
-                    return true
-                }
-            })
+    override fun setIndicatorHeight(height: Float) {
+        val indicatorHeight = DimensionUtils.dp2px(mContext, height)
+        mContainer.removeAllViews()
+        for (i in 0 until mDataCount) {
+            // 加载指示器图片
+            val params = LinearLayout.LayoutParams(indicatorHeight, indicatorHeight)// 设置指示器宽高
+            val iv = ImageView(mContext)
+            iv.scaleType = ImageView.ScaleType.FIT_CENTER
+            if (i == 0) {
+                iv.setBackgroundResource(getSelectedIndicatorResId(i))
+                params.setMargins(0, 0, 0, 0)// 设置指示器边距
+            } else {
+                iv.setBackgroundResource(getNormalIndicatorResId(i))
+                params.setMargins(mIndicatorPaddingPx, 0, 0, 0)// 设置指示器边距
+            }
+            iv.layoutParams = params
+            mContainer.addView(iv)
         }
     }
 
