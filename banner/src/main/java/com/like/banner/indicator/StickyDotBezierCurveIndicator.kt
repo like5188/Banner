@@ -8,6 +8,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import com.like.banner.utils.DimensionUtils
@@ -57,35 +58,40 @@ class StickyDotBezierCurveIndicator(
             require(mIndicatorPaddingPx > 0) { "indicatorPadding 必须大于0" }
             require(mSelectedColors.isNotEmpty()) { "mSelectedColors 不能为空" }
 
-            val containerHeight =
-                mContainer.height - mContainer.paddingTop - mContainer.paddingBottom
-            // 计算最大最小圆点半径
-            mMaxCircleRadius = containerHeight / 2f
-            mMinCircleRadius = 1f
-            // 设置本控制器的宽高
-            val w =
-                (mMaxCircleRadius * 2 * mDataCount + mIndicatorPaddingPx * mDataCount).toInt()// 左右各留 mIndicatorPaddingPx/2 的位置，用于显示过渡动画
-            this.layoutParams = ViewGroup.LayoutParams(w, containerHeight)
+            mContainer.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+                override fun onPreDraw(): Boolean {
+                    mContainer.viewTreeObserver.removeOnPreDrawListener(this)
+                    val containerHeight = mContainer.height - mContainer.paddingTop - mContainer.paddingBottom
+                    // 计算最大最小圆点半径
+                    mMaxCircleRadius = containerHeight / 2f
+                    mMinCircleRadius = 1f
+                    // 设置本控制器的宽高
+                    val w =
+                        (mMaxCircleRadius * 2 * mDataCount + mIndicatorPaddingPx * mDataCount).toInt()// 左右各留 mIndicatorPaddingPx/2 的位置，用于显示过渡动画
+                    this@StickyDotBezierCurveIndicator.layoutParams = ViewGroup.LayoutParams(w, containerHeight)
 
-            // 确定不随滚动而改变的
-            mCurTransitionalCircle1.centerY = mMaxCircleRadius
-            mNextTransitionalCircle1.centerY = mMaxCircleRadius
-            mCurTransitionalCircle2.centerY = mMaxCircleRadius
-            mNextTransitionalCircle2.centerY = mMaxCircleRadius
+                    // 确定不随滚动而改变的
+                    mCurTransitionalCircle1.centerY = mMaxCircleRadius
+                    mNextTransitionalCircle1.centerY = mMaxCircleRadius
+                    mCurTransitionalCircle2.centerY = mMaxCircleRadius
+                    mNextTransitionalCircle2.centerY = mMaxCircleRadius
 
-            // 计算所有占位圆点
-            var startCenterX = left + mIndicatorPaddingPx / 2 + mMaxCircleRadius
-            for (i in 0 until mDataCount) {
-                val circle = Circle()
-                circle.centerX = startCenterX
-                circle.centerY = mMaxCircleRadius
-                circle.radius = mMaxCircleRadius
-                mPositions.add(circle)
-                startCenterX += mIndicatorPaddingPx + mMaxCircleRadius * 2f
-            }
+                    // 计算所有占位圆点
+                    var startCenterX = left + mIndicatorPaddingPx / 2 + mMaxCircleRadius
+                    for (i in 0 until mDataCount) {
+                        val circle = Circle()
+                        circle.centerX = startCenterX
+                        circle.centerY = mMaxCircleRadius
+                        circle.radius = mMaxCircleRadius
+                        mPositions.add(circle)
+                        startCenterX += mIndicatorPaddingPx + mMaxCircleRadius * 2f
+                    }
 
-            mContainer.removeAllViews()
-            mContainer.addView(this)
+                    mContainer.removeAllViews()
+                    mContainer.addView(this@StickyDotBezierCurveIndicator)
+                    return true
+                }
+            })
         }
     }
 

@@ -1,6 +1,7 @@
 package com.like.banner.indicator
 
 import android.content.Context
+import android.view.ViewTreeObserver
 import android.widget.ImageView
 import android.widget.LinearLayout
 import com.like.banner.utils.DimensionUtils
@@ -39,23 +40,29 @@ class ImageIndicator(
                 require(it > 0) { "mSelectedIndicatorResIds 中的图片资源 id 无效" }
             }
 
-            val containerHeight = mContainer.height - mContainer.paddingTop - mContainer.paddingBottom
-            mContainer.removeAllViews()
-            for (i in 0 until mDataCount) {
-                // 加载指示器图片
-                val params = LinearLayout.LayoutParams(containerHeight, containerHeight)// 设置指示器宽高
-                val iv = ImageView(mContext)
-                iv.scaleType = ImageView.ScaleType.FIT_CENTER
-                if (i == 0) {
-                    iv.setBackgroundResource(getSelectedIndicatorResId(i))
-                    params.setMargins(0, 0, 0, 0)// 设置指示器边距
-                } else {
-                    iv.setBackgroundResource(getNormalIndicatorResId(i))
-                    params.setMargins(mIndicatorPaddingPx, 0, 0, 0)// 设置指示器边距
+            mContainer.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+                override fun onPreDraw(): Boolean {
+                    mContainer.viewTreeObserver.removeOnPreDrawListener(this)
+                    val containerHeight = mContainer.height - mContainer.paddingTop - mContainer.paddingBottom
+                    mContainer.removeAllViews()
+                    for (i in 0 until mDataCount) {
+                        // 加载指示器图片
+                        val params = LinearLayout.LayoutParams(containerHeight, containerHeight)// 设置指示器宽高
+                        val iv = ImageView(mContext)
+                        iv.scaleType = ImageView.ScaleType.FIT_CENTER
+                        if (i == 0) {
+                            iv.setBackgroundResource(getSelectedIndicatorResId(i))
+                            params.setMargins(0, 0, 0, 0)// 设置指示器边距
+                        } else {
+                            iv.setBackgroundResource(getNormalIndicatorResId(i))
+                            params.setMargins(mIndicatorPaddingPx, 0, 0, 0)// 设置指示器边距
+                        }
+                        iv.layoutParams = params
+                        mContainer.addView(iv)
+                    }
+                    return true
                 }
-                iv.layoutParams = params
-                mContainer.addView(iv)
-            }
+            })
         }
     }
 

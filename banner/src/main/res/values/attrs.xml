@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="BannerViewPager">
+        <attr name="height_width_ratio" format="float" />
+    </declare-styleable>
+</resources>

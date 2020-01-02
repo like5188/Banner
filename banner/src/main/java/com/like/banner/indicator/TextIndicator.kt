@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.PaintFlagsDrawFilter
 import android.view.Gravity
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import androidx.annotation.ColorInt
 import androidx.appcompat.widget.AppCompatTextView
 
@@ -29,12 +30,18 @@ class TextIndicator(
 
     init {
         if (mDataCount > 0) {
-            // 设置CircleTextView的宽高
-            val containerHeight = mContainer.height - mContainer.paddingTop - mContainer.paddingBottom
-            mCircleTextView.layoutParams = ViewGroup.LayoutParams(containerHeight, containerHeight)
+            mContainer.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+                override fun onPreDraw(): Boolean {
+                    mContainer.viewTreeObserver.removeOnPreDrawListener(this)
+                    // 设置CircleTextView的宽高
+                    val containerHeight = mContainer.height - mContainer.paddingTop - mContainer.paddingBottom
+                    mCircleTextView.layoutParams = ViewGroup.LayoutParams(containerHeight, containerHeight)
 
-            mContainer.removeAllViews()
-            mContainer.addView(mCircleTextView)
+                    mContainer.removeAllViews()
+                    mContainer.addView(mCircleTextView)
+                    return true
+                }
+            })
         }
     }
 

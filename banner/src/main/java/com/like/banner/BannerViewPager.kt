@@ -13,6 +13,22 @@ import android.widget.Scroller
 open class BannerViewPager(context: Context, attrs: AttributeSet?) :
     androidx.viewpager.widget.ViewPager(context, attrs) {
     private var isScrollable = false
+    private var mHeightWidthRatio = 0f
+
+    init {
+        val a = context.obtainStyledAttributes(attrs, R.styleable.BannerViewPager)
+        mHeightWidthRatio = a.getFloat(R.styleable.BannerViewPager_height_width_ratio, 0f)
+        a.recycle()
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        if (mHeightWidthRatio > 0f) {
+            val w = measuredWidth
+            val h = (measuredWidth * mHeightWidthRatio).toInt()
+            setMeasuredDimension(w, h)
+        }
+    }
 
     fun setScrollable(isScrollable: Boolean) {
         this.isScrollable = isScrollable

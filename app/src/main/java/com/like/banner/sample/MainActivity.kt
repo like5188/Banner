@@ -12,7 +12,6 @@ import com.like.banner.BannerPagerAdapter
 import com.like.banner.indicator.IBannerIndicator
 import com.like.banner.indicator.StickyRoundRectIndicator
 import com.like.banner.sample.databinding.ActivityMainBinding
-import com.like.common.util.onPreDrawListener
 import com.like.common.view.viewPagerTransformer.RotateYTransformer
 import java.util.*
 
@@ -56,56 +55,24 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-//        mBinding.vp.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-//            private val argbEvaluator = ArgbEvaluator()
-//
-//            override fun onPageScrollStateChanged(state: Int) {
-//            }
-//
-//            // position表示目标位置，positionOffset表示偏移的百分比，positionOffsetPixels表示偏移的像素
-//            override fun onPageScrolled(
-//                position: Int,
-//                positionOffset: Float,
-//                positionOffsetPixels: Int
-//            ) {
-//                val iv0 = mBinding.vp.getChildAt(adapter.getRealPosition(position))
-//                    .findViewById<ImageView>(R.id.iv)
-//                val iv1 = mBinding.vp.getChildAt(adapter.getRealPosition(position + 1))
-//                    .findViewById<ImageView>(R.id.iv)
-//                if (iv0 != null && iv0.drawable != null && iv1 != null && iv1.drawable != null) {
-//                    val color0 = ImageUtils.getColor(iv0.drawable, androidx.palette.graphics.Target.DARK_MUTED, 0x000000)
-//                    val color1 = ImageUtils.getColor(iv1.drawable, androidx.palette.graphics.Target.DARK_MUTED, 0x000000)
-//                    mBinding.root.setBackgroundColor(
-//                        argbEvaluator.evaluate(positionOffset, color0, color1).toString().toInt()
-//                    )
-//                }
-//            }
-//
-//            override fun onPageSelected(position: Int) {
-//            }
-//
-//        })
-
-        mBinding.vp.onPreDrawListener {
-            it.layoutParams.height = (it.width * 0.4f).toInt()// vp 的高度是宽度的 0.4
-
-            //            val indicator: IBannerIndicator = TextIndicator(this, data.size, indicatorContainer).apply {
+        // 设置指示器
+        //            val indicator: IBannerIndicator = TextIndicator(this, data.size, indicatorContainer).apply {
 //                setTextSize(12f)
 //                setTextColor(Color.WHITE)
 //                setBackgroundColor(Color.GRAY)
 //            }
 //            val indicator: IBannerIndicator = ImageIndicator(this, data.size, indicatorContainer, 10f, listOf(R.drawable.store_point2), listOf(R.drawable.store_point1))
 //            val indicator: IBannerIndicator = StickyDotBezierCurveIndicator(this, data.size, indicatorContainer, 20f, Color.GRAY, listOf(Color.parseColor("#ff4a42"), Color.parseColor("#fcde64"), Color.parseColor("#73e8f4")))
-            val indicator: IBannerIndicator = StickyRoundRectIndicator(
-                this, data.size, mBinding.indicatorContainer, 20f, 10f, Color.GRAY, listOf(
-                    Color.parseColor("#ff4a42"),
-                    Color.parseColor("#fcde64"),
-                    Color.parseColor("#73e8f4")
-                )
+        val indicator: IBannerIndicator = StickyRoundRectIndicator(
+            this, data.size, mBinding.indicatorContainer, 20f, 10f, Color.GRAY, listOf(
+                Color.parseColor("#ff4a42"),
+                Color.parseColor("#fcde64"),
+                Color.parseColor("#73e8f4")
             )
-            indicator.setViewPager(mBinding.vp)
-        }
+        )
+        indicator.setViewPager(mBinding.vp)
 
+        // 设置轮播控制器
         mBannerController.setViewPager(mBinding.vp)
             .setCycleInterval(3000L)
             .play()
