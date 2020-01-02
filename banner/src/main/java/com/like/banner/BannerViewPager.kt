@@ -22,12 +22,16 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) :
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        var hms = heightMeasureSpec
         if (mHeightWidthRatio > 0f) {
-            val w = measuredWidth
-            val h = (measuredWidth * mHeightWidthRatio).toInt()
-            setMeasuredDimension(w, h)
+            val widthMode = MeasureSpec.getMode(widthMeasureSpec)
+            val widthSize = MeasureSpec.getSize(widthMeasureSpec)
+            if (widthMode == MeasureSpec.EXACTLY) {
+                val heightSize = (widthSize * mHeightWidthRatio).toInt()
+                hms = MeasureSpec.makeMeasureSpec(heightSize, MeasureSpec.EXACTLY)
+            }
         }
+        super.onMeasure(widthMeasureSpec, hms)
     }
 
     fun setScrollable(isScrollable: Boolean) {
