@@ -29,4 +29,23 @@
 
 2、使用
 ```java
+    // ViewPager的使用：直接在布局文件中使用com.like.banner.BannerViewPager。adapter使用com.like.banner.BannerPagerAdapter
+    val adapter: BannerPagerAdapter = MyBannerPagerAdapter(this, data)
+    mBinding.vp.adapter = adapter
+
+    // 指示器 com.like.banner.indicator.IBannerIndicator 的使用：
+    val indicator: IBannerIndicator = StickyRoundRectIndicator(
+        this, data.size, mBinding.indicatorContainer, 20f, 10f, Color.GRAY, listOf(
+            Color.parseColor("#ff4a42"),
+            Color.parseColor("#fcde64"),
+            Color.parseColor("#73e8f4")
+        )
+    )
+    indicator.setViewPager(mBinding.vp)// 调用 [setViewPager] 方法，和 [com.like.banner.BannerController] 设置同一个 [com.like.banner.BannerViewPager] 即可。
+
+    // 使用 com.like.banner.BannerController 控制自动播放
+    private val mBannerController: BannerController by lazy { BannerController() }
+    mBannerController.setViewPager(mBinding.vp)
+        .setCycleInterval(3000L)
+        .play()
 ```

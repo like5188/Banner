@@ -6,7 +6,7 @@ import com.like.banner.BannerViewPager
 
 /**
  * Banner 的指示器基类。
- * 使用方式：调用 [setViewPager] 方法，和 [com.like.common.view.banner.BannerController] 设置同一个 [com.like.common.view.banner.BannerViewPager] 即可。
+ * 使用方式：调用 [setViewPager] 方法，和 [com.like.banner.BannerController] 设置同一个 [com.like.banner.BannerViewPager] 即可。
  */
 interface IBannerIndicator {
 
