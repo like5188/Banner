@@ -31,8 +31,7 @@ class StickyDotBezierCurveIndicator(
     private val mNormalColor: Int,
     private val mSelectedColors: List<Int>
 ) : View(mContext), IBannerIndicator {
-    private val mIndicatorPaddingPx: Int =
-        DimensionUtils.dp2px(mContext, indicatorPadding)// 指示器之间的间隔
+    private val mIndicatorPaddingPx: Int = DimensionUtils.dp2px(mContext, indicatorPadding)// 指示器之间的间隔
 
     private val mPositions = mutableListOf<Circle>()// 占位圆点
 
@@ -41,8 +40,7 @@ class StickyDotBezierCurveIndicator(
 
     private var mTransitionalColor = 0// 画过渡阶段（包括过渡圆点和贝塞尔曲线）的颜色
 
-    private val mCurTransitionalCircle1 =
-        Circle()// 两个过渡圆点中的第一个。此圆点会紧跟着mNextTransitionalCircle1圆点到达下一个位置。
+    private val mCurTransitionalCircle1 = Circle()// 两个过渡圆点中的第一个。此圆点会紧跟着mNextTransitionalCircle1圆点到达下一个位置。
     private val mNextTransitionalCircle1 = Circle()// 两个过渡圆点中的第二个
     private val mCurTransitionalCircle2 = Circle()// 用于辅助处理首尾交替的情况
     private val mNextTransitionalCircle2 = Circle()// 用于辅助处理首尾交替的情况
@@ -86,6 +84,7 @@ class StickyDotBezierCurveIndicator(
                 startCenterX += mIndicatorPaddingPx + mMaxCircleRadius * 2f
             }
 
+            mContainer.removeAllViews()
             mContainer.addView(this)
         }
     }

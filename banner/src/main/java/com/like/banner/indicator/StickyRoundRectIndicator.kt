@@ -34,8 +34,7 @@ class StickyRoundRectIndicator(
     private val mSelectedColors: List<Int>
 ) : View(mContext), IBannerIndicator {
     private val mIndicatorWidthPx: Int = DimensionUtils.dp2px(mContext, indicatorWidth)// 指示器的宽度
-    private val mIndicatorPaddingPx: Int =
-        DimensionUtils.dp2px(mContext, indicatorPadding)// 指示器之间的间隔
+    private val mIndicatorPaddingPx: Int = DimensionUtils.dp2px(mContext, indicatorPadding)// 指示器之间的间隔
 
     private val mPositions = mutableListOf<RectF>()// 占位矩形
 
@@ -80,6 +79,7 @@ class StickyRoundRectIndicator(
                 startLeft = rect.right + mIndicatorPaddingPx
             }
 
+            mContainer.removeAllViews()
             mContainer.addView(this)
         }
     }

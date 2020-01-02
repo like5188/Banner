@@ -30,10 +30,10 @@ class TextIndicator(
     init {
         if (mDataCount > 0) {
             // 设置CircleTextView的宽高
-            val containerHeight =
-                mContainer.height - mContainer.paddingTop - mContainer.paddingBottom
+            val containerHeight = mContainer.height - mContainer.paddingTop - mContainer.paddingBottom
             mCircleTextView.layoutParams = ViewGroup.LayoutParams(containerHeight, containerHeight)
 
+            mContainer.removeAllViews()
             mContainer.addView(mCircleTextView)
         }
     }

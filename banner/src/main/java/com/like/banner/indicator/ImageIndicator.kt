@@ -39,8 +39,8 @@ class ImageIndicator(
                 require(it > 0) { "mSelectedIndicatorResIds 中的图片资源 id 无效" }
             }
 
-            val containerHeight =
-                mContainer.height - mContainer.paddingTop - mContainer.paddingBottom
+            val containerHeight = mContainer.height - mContainer.paddingTop - mContainer.paddingBottom
+            mContainer.removeAllViews()
             for (i in 0 until mDataCount) {
                 // 加载指示器图片
                 val params = LinearLayout.LayoutParams(containerHeight, containerHeight)// 设置指示器宽高
