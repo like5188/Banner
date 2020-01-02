@@ -34,13 +34,15 @@
     mBinding.vp.adapter = adapter
 
     // 指示器 com.like.banner.indicator.IBannerIndicator 的使用：
-    val indicator: IBannerIndicator = StickyRoundRectIndicator(
-        this, data.size, mBinding.indicatorContainer, 20f, 10f, Color.GRAY, listOf(
-            Color.parseColor("#ff4a42"),
-            Color.parseColor("#fcde64"),
-            Color.parseColor("#73e8f4")
-        )
+    val indicator: IBannerIndicator = ImageIndicator(
+        this,
+        data.size,
+        mBinding.indicatorContainer,
+        10f,
+        listOf(R.drawable.store_point2),
+        listOf(R.drawable.store_point1)
     )
+    indicator.setIndicatorHeight(20f)
     indicator.setViewPager(mBinding.vp)// 调用 [setViewPager] 方法，和 [com.like.banner.BannerController] 设置同一个 [com.like.banner.BannerViewPager] 即可。
 
     // 使用 com.like.banner.BannerController 控制自动播放
