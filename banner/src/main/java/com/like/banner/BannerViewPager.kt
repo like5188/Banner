@@ -13,9 +13,11 @@ import android.widget.Scroller
 open class BannerViewPager(context: Context, attrs: AttributeSet?) :
     androidx.viewpager.widget.ViewPager(context, attrs) {
     private var isScrollable = false
+    // 高宽比例
     private var mHeightWidthRatio = 0f
 
     init {
+        // 获取高宽比例
         val a = context.obtainStyledAttributes(attrs, R.styleable.BannerViewPager)
         mHeightWidthRatio = a.getFloat(R.styleable.BannerViewPager_height_width_ratio, 0f)
         a.recycle()
