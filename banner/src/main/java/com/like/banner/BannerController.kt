@@ -1,7 +1,6 @@
 package com.like.banner
 
 import android.os.Handler
-import android.util.Log
 import androidx.viewpager.widget.ViewPager
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -44,7 +43,6 @@ class BannerController {
     private val mOnPageChangeListener = object : ViewPager.OnPageChangeListener {
         // position当前选择的是哪个页面。注意：如果mCount=1，那么默认会显示第0页，此时不会触发此方法，只会触发onPageScrolled方法。
         override fun onPageSelected(position: Int) {
-            Log.d("tag", "onPageSelected")
             mCurPosition = position
         }
 
@@ -54,11 +52,9 @@ class BannerController {
             positionOffset: Float,
             positionOffsetPixels: Int
         ) {
-            Log.i("tag", "onPageScrolled")
         }
 
         override fun onPageScrollStateChanged(state: Int) {
-            Log.w("tag", "onPageScrollStateChanged")
             when (state) {
                 ViewPager.SCROLL_STATE_IDLE -> {// 页面停止在了某页，有可能是手指滑动一页结束，有可能是自动滑动一页结束，开始自动播放。
                     play()

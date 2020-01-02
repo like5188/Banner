@@ -1,10 +1,7 @@
 package com.like.banner.sample
 
-import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
-import android.util.DisplayMetrics
-import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.like.banner.BannerController
@@ -12,7 +9,7 @@ import com.like.banner.BannerPagerAdapter
 import com.like.banner.indicator.IBannerIndicator
 import com.like.banner.indicator.StickyRoundRectIndicator
 import com.like.banner.sample.databinding.ActivityMainBinding
-import com.like.common.view.viewPagerTransformer.RotateYTransformer
+import com.ocnyang.pagetransformerhelp.transformer.ParallaxTransformer
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -38,22 +35,7 @@ class MainActivity : AppCompatActivity() {
         val adapter: BannerPagerAdapter = MyBannerPagerAdapter(this, data)
         mBinding.vp.adapter = adapter
 
-        mBinding.vp.setPageTransformer(true, object : RotateYTransformer() {
-            override fun getRotate(context: Context): Float {
-                var rotate = 0.5f
-                (context.getSystemService(Context.WINDOW_SERVICE) as? WindowManager)?.apply {
-                    val metric = DisplayMetrics()
-                    defaultDisplay.getMetrics(metric)
-                    val densityDpi = metric.densityDpi
-                    if (densityDpi <= 240) {
-                        rotate = 3f
-                    } else if (densityDpi <= 320) {
-                        rotate = 2f
-                    }
-                }
-                return rotate
-            }
-        })
+        mBinding.vp.setPageTransformer(true, ParallaxTransformer())
 
         // 设置指示器
         //            val indicator: IBannerIndicator = TextIndicator(this, data.size, indicatorContainer).apply {
