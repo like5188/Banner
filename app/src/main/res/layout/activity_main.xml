@@ -3,12 +3,16 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:clipChildren="false">
 
         <com.like.banner.BannerViewPager
             android:id="@+id/vp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:clipChildren="false" />
 
         <LinearLayout
             android:id="@+id/indicatorContainer"

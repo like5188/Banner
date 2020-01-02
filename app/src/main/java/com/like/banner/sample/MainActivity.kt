@@ -9,7 +9,8 @@ import com.like.banner.BannerPagerAdapter
 import com.like.banner.indicator.IBannerIndicator
 import com.like.banner.indicator.StickyDotBezierCurveIndicator
 import com.like.banner.sample.databinding.ActivityMainBinding
-import com.ocnyang.pagetransformerhelp.transformer.ParallaxTransformer
+import com.like.banner.utils.DimensionUtils
+import com.ocnyang.pagetransformerhelp.cardtransformer.AlphaPageTransformer
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -35,7 +36,8 @@ class MainActivity : AppCompatActivity() {
         val adapter: BannerPagerAdapter = MyBannerPagerAdapter(this, data)
         mBinding.vp.adapter = adapter
 
-        mBinding.vp.setPageTransformer(true, ParallaxTransformer())
+        mBinding.vp.pageMargin = DimensionUtils.dp2px(this, 10f)
+        mBinding.vp.setPageTransformer(true, AlphaPageTransformer())
 
         // 设置指示器
 //        val indicator: IBannerIndicator = TextIndicator(this, data.size, mBinding.indicatorContainer).apply {
