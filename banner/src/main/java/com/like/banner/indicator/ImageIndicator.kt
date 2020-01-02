@@ -1,6 +1,7 @@
 package com.like.banner.indicator
 
 import android.content.Context
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import com.like.banner.utils.DimensionUtils
@@ -19,7 +20,7 @@ import com.like.banner.utils.DimensionUtils
 class ImageIndicator(
     private val mContext: Context,
     private val mDataCount: Int,
-    private val mContainer: LinearLayout,
+    private val mContainer: ViewGroup,
     indicatorPadding: Float,
     private val mNormalIndicatorResIds: List<Int>,
     private val mSelectedIndicatorResIds: List<Int>

@@ -1,13 +1,12 @@
 package com.like.banner.sample
 
-import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.like.banner.BannerController
 import com.like.banner.BannerPagerAdapter
 import com.like.banner.indicator.IBannerIndicator
-import com.like.banner.indicator.StickyDotBezierCurveIndicator
+import com.like.banner.indicator.ImageIndicator
 import com.like.banner.sample.databinding.ActivityMainBinding
 import com.like.banner.utils.DimensionUtils
 import com.ocnyang.pagetransformerhelp.cardtransformer.AlphaPageTransformer
@@ -45,22 +44,22 @@ class MainActivity : AppCompatActivity() {
 //            setTextColor(Color.WHITE)
 //            setBackgroundColor(Color.GRAY)
 //        }
-//        val indicator: IBannerIndicator = ImageIndicator(
-//            this,
-//            data.size,
-//            mBinding.indicatorContainer,
-//            10f,
-//            listOf(R.drawable.store_point2),
-//            listOf(R.drawable.store_point1)
-//        )
-        val indicator: IBannerIndicator = StickyDotBezierCurveIndicator(
+        val indicator: IBannerIndicator = ImageIndicator(
             this,
             data.size,
             mBinding.indicatorContainer,
-            20f,
-            Color.GRAY,
-            listOf(Color.parseColor("#ff4a42"), Color.parseColor("#fcde64"), Color.parseColor("#73e8f4"))
+            10f,
+            listOf(R.drawable.store_point2),
+            listOf(R.drawable.store_point1)
         )
+//        val indicator: IBannerIndicator = StickyDotBezierCurveIndicator(
+//            this,
+//            data.size,
+//            mBinding.indicatorContainer,
+//            20f,
+//            Color.GRAY,
+//            listOf(Color.parseColor("#ff4a42"), Color.parseColor("#fcde64"), Color.parseColor("#73e8f4"))
+//        )
 //        val indicator: IBannerIndicator = StickyRoundRectIndicator(
 //            this, data.size, mBinding.indicatorContainer, 20f, 10f, Color.GRAY, listOf(
 //                Color.parseColor("#ff4a42"),
