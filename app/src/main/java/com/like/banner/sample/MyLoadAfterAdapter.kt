@@ -1,6 +1,5 @@
 package com.like.banner.sample
 
-import android.content.Context
 import android.graphics.Color
 import com.like.banner.BannerController
 import com.like.banner.indicator.IBannerIndicator
@@ -12,14 +11,8 @@ import com.like.livedatarecyclerview.model.IRecyclerViewItem
 import com.like.livedatarecyclerview.viewholder.CommonViewHolder
 import com.ocnyang.pagetransformerhelp.cardtransformer.CascadingPageTransformer
 
-class MyLoadAfterAdapter(private val context: Context, onLoadAfter: () -> Unit) : BaseLoadAfterAdapter(onLoadAfter) {
+class MyLoadAfterAdapter(private val context: MainActivity, onLoadAfter: () -> Unit) : BaseLoadAfterAdapter(onLoadAfter) {
     private val mBannerControllers = mutableMapOf<CommonViewHolder, BannerController>()
-
-    fun destroyBanners() {
-        mBannerControllers.forEach {
-            it.value.pause()
-        }
-    }
 
     override fun onViewAttachedToWindow(holder: CommonViewHolder) {
         super.onViewAttachedToWindow(holder)
@@ -91,7 +84,7 @@ class MyLoadAfterAdapter(private val context: Context, onLoadAfter: () -> Unit) 
                     indicator.setViewPager(binding.vp)
 
                     // 设置轮播控制器
-                    val bannerController = BannerController()
+                    val bannerController = BannerController(context)
                     bannerController.setViewPager(binding.vp)
                         .setCycleInterval(3000L)
                         .play()

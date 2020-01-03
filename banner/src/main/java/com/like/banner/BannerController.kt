@@ -1,18 +1,16 @@
 package com.like.banner
 
 import android.util.Log
+import androidx.annotation.MainThread
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
-import com.like.banner.utils.WeakHandler
-import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.coroutines.*
 
 /**
  * 通过 [BannerViewPager]、[BannerPagerAdapter] 控制 Banner 进行无限轮播
  */
-class BannerController {
-    /**
-     * 是否正在自动循环播放
-     */
-    private val mIsAutoPlaying = AtomicBoolean(false)
+class BannerController(private val mLifecycleOwner: LifecycleOwner) {
     /**
      * 真实的数据条数
      */
@@ -27,19 +25,7 @@ class BannerController {
     private var mCycleInterval: Long = 3000L
 
     private var mViewPager: BannerViewPager? = null
-
-    private val mCycleHandler: WeakHandler by lazy {
-        WeakHandler {
-            if (mIsAutoPlaying.get() && mCycleInterval > 0 && mRealCount > 1) {
-                mViewPager?.let {
-                    mCurPosition++
-                    it.setCurrentItem(mCurPosition, true)
-                    mCycleHandler.sendEmptyMessageDelayed(0, mCycleInterval)
-                }
-            }
-            true
-        }
-    }
+    private var mJob: Job? = null
 
     private val mOnPageChangeListener = object : ViewPager.OnPageChangeListener {
         // position当前选择的是哪个页面。注意：如果mCount=1，那么默认会显示第0页，此时不会触发此方法，只会触发onPageScrolled方法。
@@ -78,6 +64,7 @@ class BannerController {
     /**
      * @param viewPager [BannerViewPager] 类型，它必须已经设置了 [BannerPagerAdapter]。
      */
+    @MainThread
     fun setViewPager(viewPager: BannerViewPager): BannerController {
         val adapter = viewPager.adapter
         require(adapter is BannerPagerAdapter) { "adapter of viewPager must be com.like.banner.BannerPagerAdapter" }
@@ -102,25 +89,29 @@ class BannerController {
     fun play() {
         if (mCycleInterval <= 0) return
         if (mRealCount <= 1) return
-        if (mIsAutoPlaying.compareAndSet(false, true)) {
-            setViewPagerFirstLayoutFalse(mViewPager)
-            mCycleHandler.removeCallbacksAndMessages(null)
-            mCycleHandler.sendEmptyMessageDelayed(0, mCycleInterval)
+        val viewPager = mViewPager ?: return
+        if (mJob == null) {
+            setViewPagerFirstLayoutFalse(viewPager)
+            mJob = mLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+                while (isActive) {
+                    delay(mCycleInterval)
+                    mCurPosition++
+                    viewPager.setCurrentItem(mCurPosition, true)
+                }
+            }
         }
     }
 
     fun pause() {
-        if (mIsAutoPlaying.compareAndSet(true, false)) {
-            mCycleHandler.removeCallbacksAndMessages(null)
-        }
+        mJob?.cancel()
+        mJob = null
     }
 
     /**
      * 设置 [ViewPager] 的 [ViewPager.mFirstLayout] 属性为 false。否则无法触发 [ViewPager.scrollToItem] 方法，从而进行平滑滚动。
      * 因为在 [ViewPager.onAttachedToWindow] 中把 [ViewPager.mFirstLayout] 属性设置为了 true。所以在重新显示 banner 时，没有动画效果。
      */
-    private fun setViewPagerFirstLayoutFalse(viewPager: ViewPager?) {
-        viewPager ?: return
+    private fun setViewPagerFirstLayoutFalse(viewPager: ViewPager) {
         try {
             val field = ViewPager::class.java.getDeclaredField("mFirstLayout")
             field.isAccessible = true
