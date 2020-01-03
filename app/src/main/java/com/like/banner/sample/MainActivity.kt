@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: MyViewModel by lazy {
         ViewModelProviders.of(this, MyViewModel.Factory()).get(MyViewModel::class.java)
     }
+    private var mAdapter: MyLoadAfterAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,20 +35,19 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.getResult().liveValue.observe(this, Observer {
             val statusReport = viewModel.getResult().liveStatus.value
-            var adapter: MyLoadAfterAdapter? = null
             when {
                 (statusReport?.type is Initial || statusReport?.type is Refresh) && statusReport.status is Success -> {
-                    adapter = MyLoadAfterAdapter(this) { viewModel.loadAfter() }
-                    recyclerView.adapter = adapter
-                    adapter.mAdapterDataManager.clearAndAdd(it)
+                    mAdapter = MyLoadAfterAdapter(this) { viewModel.loadAfter() }
+                    recyclerView.adapter = mAdapter
+                    mAdapter?.mAdapterDataManager?.clearAndAdd(it)
                 }
                 statusReport?.type is After && statusReport.status is Success -> {
-                    adapter?.mAdapterDataManager?.getFooters()?.forEach { iFooter ->
+                    mAdapter?.mAdapterDataManager?.getFooters()?.forEach { iFooter ->
                         if (iFooter is Footer) {
                             iFooter.status.set(0)
                         }
                     }
-                    adapter?.mAdapterDataManager?.addItemsToEnd(it.map())
+                    mAdapter?.mAdapterDataManager?.addItemsToEnd(it.map())
                 }
             }
         })
