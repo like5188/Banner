@@ -18,7 +18,7 @@ class MyLoadAfterAdapter(private val context: Context, onLoadAfter: () -> Unit) 
     override fun bindOtherVariable(holder: CommonViewHolder, position: Int, item: IRecyclerViewItem?) {
         when (item) {
             is BannerInfo -> {
-                if (holder.binding is ViewBannerBinding) {
+                if (holder.binding is ViewBannerBinding && item.bannerList.isNotEmpty()) {
                     val binding = holder.binding as ViewBannerBinding
                     binding.vp.setScrollSpeed()
                     binding.vp.adapter = MyBannerPagerAdapter(context, item.bannerList)

@@ -6,7 +6,7 @@ import android.view.ViewGroup
 abstract class BannerPagerAdapter(private val mList: List<*>) : androidx.viewpager.widget.PagerAdapter() {
     fun getRealCount(): Int = mList.size
 
-    fun getRealPosition(position: Int): Int = position % getRealCount()
+    fun getRealPosition(position: Int): Int = if (mList.isEmpty()) 0 else position % mList.size
 
     final override fun getCount(): Int = Int.MAX_VALUE
 
