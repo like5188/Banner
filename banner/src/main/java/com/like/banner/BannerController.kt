@@ -103,6 +103,7 @@ class BannerController {
         if (mCycleInterval <= 0) return
         if (mRealCount <= 1) return
         if (mIsAutoPlaying.compareAndSet(false, true)) {
+            setViewPagerFirstLayoutFalse(mViewPager)
             mCycleHandler.removeCallbacksAndMessages(null)
             mCycleHandler.sendEmptyMessageDelayed(0, mCycleInterval)
         }
@@ -111,6 +112,21 @@ class BannerController {
     fun pause() {
         if (mIsAutoPlaying.compareAndSet(true, false)) {
             mCycleHandler.removeCallbacksAndMessages(null)
+        }
+    }
+
+    /**
+     * 设置 [ViewPager] 的 [ViewPager.mFirstLayout] 属性为 false。否则无法触发 [ViewPager.scrollToItem] 方法，从而进行平滑滚动。
+     * 因为在 [ViewPager.onAttachedToWindow] 中把 [ViewPager.mFirstLayout] 属性设置为了 true。所以在重新显示 banner 时，没有动画效果。
+     */
+    private fun setViewPagerFirstLayoutFalse(viewPager: ViewPager?) {
+        viewPager ?: return
+        try {
+            val field = ViewPager::class.java.getDeclaredField("mFirstLayout")
+            field.isAccessible = true
+            field.set(viewPager, false)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
