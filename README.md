@@ -55,7 +55,4 @@
     bannerController.setViewPager(binding.vp)
         .setCycleInterval(3000L)
         .play()
-
-    // 释放资源，避免内存泄露。
-    bannerController.pause()
 ```
