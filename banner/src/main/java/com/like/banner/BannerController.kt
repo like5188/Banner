@@ -83,11 +83,12 @@ class BannerController(private val mLifecycleOwner: LifecycleOwner) {
             mRealCount > 1 -> {
                 viewPager.setScrollable(true)
                 viewPager.addOnPageChangeListener(mOnPageChangeListener)
+                if (mCurPosition == -1) {// 如果没有设置position，就初始化。
+                    // 取余处理，避免默认值不能被 mDataCount 整除，从而不能让初始时在第0个位置。
+                    mCurPosition = Int.MAX_VALUE / 2 - (Int.MAX_VALUE / 2) % mRealCount
+                }
                 // 因为页面变化，所以setCurrentItem方法能触发onPageSelected、onPageScrolled方法，
                 // 但是不能触发 onPageScrollStateChanged，所以不会启动自动播放，由使用者手动开启自动播放
-                if (mCurPosition == -1) {
-                    mCurPosition = Int.MAX_VALUE / 2 - (Int.MAX_VALUE / 2) % mRealCount// 取余处理，避免默认值不能被 mDataCount 整除，从而不能让初始时在第0个位置。
-                }
                 viewPager.currentItem = mCurPosition
             }
         }
