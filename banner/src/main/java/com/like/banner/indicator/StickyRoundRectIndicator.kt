@@ -62,9 +62,9 @@ class StickyRoundRectIndicator(
 
         // 确定不随滚动而改变的
         mTransitionalRect1.top = 0f
-        mTransitionalRect1.bottom = height.toFloat()
+        mTransitionalRect1.bottom = height
         mTransitionalRect2.top = 0f
-        mTransitionalRect2.bottom = height.toFloat()
+        mTransitionalRect2.bottom = height
 
         // 计算所有占位矩形
         var startLeft = left + mIndicatorPaddingPx / 2f
@@ -73,7 +73,7 @@ class StickyRoundRectIndicator(
             rect.left = startLeft
             rect.top = 0f
             rect.right = startLeft + mIndicatorWidthPx
-            rect.bottom = height.toFloat()
+            rect.bottom = height
             mPositions.add(rect)
             startLeft = rect.right + mIndicatorPaddingPx
         }
@@ -120,26 +120,21 @@ class StickyRoundRectIndicator(
         // 计算颜色
         val currentColor = mSelectedColors[position % mSelectedColors.size]
         val nextColor = mSelectedColors[(position + 1) % mSelectedColors.size]
-        mTransitionalColor =
-            mArgbEvaluator.evaluate(positionOffset, currentColor, nextColor).toString().toInt()
+        mTransitionalColor = mArgbEvaluator.evaluate(positionOffset, currentColor, nextColor).toString().toInt()
 
         // 计算过渡矩形，它们的left和right都是不断变化的。
         val distance = mIndicatorWidthPx + mIndicatorPaddingPx// 两矩形中心之间的距离
         val currentRect = mPositions[position]
-        mTransitionalRect1.left =
-            currentRect.left + distance * mStartInterpolator.getInterpolation(positionOffset)
-        mTransitionalRect1.right =
-            currentRect.right + distance * mEndInterpolator.getInterpolation(positionOffset)
+        mTransitionalRect1.left = currentRect.left + distance * mStartInterpolator.getInterpolation(positionOffset)
+        mTransitionalRect1.right = currentRect.right + distance * mEndInterpolator.getInterpolation(positionOffset)
 
         // 当处于首尾交替的情况，在第一个占位左边一个位置再假设一个占位，用于辅助最左边的过渡动画。
         if (position == mDataCount - 1) {
             // 第一个占位左边一个位置（假设的）
             val beforeFirstRectLeft = mPositions[0].left - distance
             val beforeFirstRectRight = mPositions[0].right - distance
-            mTransitionalRect2.left =
-                beforeFirstRectLeft + distance * mStartInterpolator.getInterpolation(positionOffset)
-            mTransitionalRect2.right =
-                beforeFirstRectRight + distance * mEndInterpolator.getInterpolation(positionOffset)
+            mTransitionalRect2.left = beforeFirstRectLeft + distance * mStartInterpolator.getInterpolation(positionOffset)
+            mTransitionalRect2.right = beforeFirstRectRight + distance * mEndInterpolator.getInterpolation(positionOffset)
         }
 
         invalidate()
