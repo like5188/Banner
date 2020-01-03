@@ -18,7 +18,7 @@ class BannerController(private val mLifecycleOwner: LifecycleOwner) {
     /**
      * ViewPager的当前位置
      */
-    private var mCurPosition = Int.MAX_VALUE / 2
+    private var mCurPosition = -1
     /**
      * 循环的时间间隔，毫秒。如果<=0，表示不循环播放。默认3000L
      */
@@ -61,6 +61,12 @@ class BannerController(private val mLifecycleOwner: LifecycleOwner) {
         return this
     }
 
+    fun setPosition(position: Int) {
+        mCurPosition = position
+    }
+
+    fun getPosition(): Int = mCurPosition
+
     /**
      * @param viewPager [BannerViewPager] 类型，它必须已经设置了 [BannerPagerAdapter]。
      */
@@ -79,7 +85,9 @@ class BannerController(private val mLifecycleOwner: LifecycleOwner) {
                 viewPager.addOnPageChangeListener(mOnPageChangeListener)
                 // 因为页面变化，所以setCurrentItem方法能触发onPageSelected、onPageScrolled方法，
                 // 但是不能触发 onPageScrollStateChanged，所以不会启动自动播放，由使用者手动开启自动播放
-                mCurPosition -= mCurPosition % mRealCount// 取余处理，避免默认值不能被 mDataCount 整除
+                if (mCurPosition == -1) {
+                    mCurPosition = Int.MAX_VALUE / 2 - (Int.MAX_VALUE / 2) % mRealCount// 取余处理，避免默认值不能被 mDataCount 整除，从而不能让初始时在第0个位置。
+                }
                 viewPager.currentItem = mCurPosition
             }
         }

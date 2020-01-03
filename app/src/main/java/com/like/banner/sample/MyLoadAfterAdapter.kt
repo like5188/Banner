@@ -12,28 +12,29 @@ import com.like.livedatarecyclerview.viewholder.CommonViewHolder
 import com.ocnyang.pagetransformerhelp.cardtransformer.CascadingPageTransformer
 
 class MyLoadAfterAdapter(private val context: MainActivity, onLoadAfter: () -> Unit) : BaseLoadAfterAdapter(onLoadAfter) {
-    private val mBannerControllers = mutableMapOf<CommonViewHolder, BannerController>()
+    private val mBannerControllerCaches = mutableMapOf<CommonViewHolder, BannerController>()
+    private val mDataCaches = mutableMapOf<CommonViewHolder, IRecyclerViewItem?>()
 
     override fun onViewAttachedToWindow(holder: CommonViewHolder) {
         super.onViewAttachedToWindow(holder)
-        if (mBannerControllers.containsKey(holder)) {
-            mBannerControllers[holder]?.play()
+        if (mBannerControllerCaches.containsKey(holder)) {
+            mBannerControllerCaches[holder]?.play()
         }
     }
 
     override fun onViewDetachedFromWindow(holder: CommonViewHolder) {
         super.onViewDetachedFromWindow(holder)
-        if (mBannerControllers.containsKey(holder)) {
-            mBannerControllers[holder]?.pause()
+        if (mBannerControllerCaches.containsKey(holder)) {
+            mBannerControllerCaches[holder]?.pause()
         }
     }
 
     override fun bindOtherVariable(holder: CommonViewHolder, position: Int, item: IRecyclerViewItem?) {
         when (item) {
             is BannerInfo -> {
-                if (holder.binding is ViewBannerBinding && item.bannerList.isNotEmpty()) {
-                    val binding = holder.binding as ViewBannerBinding
-                    if (binding.vp.adapter != null) return
+                val binding = holder.binding
+                if (binding is ViewBannerBinding && item.bannerList.isNotEmpty()) {
+                    binding.vp.clearOnPageChangeListeners()// 重新绑定数据时，需要清空ViewPager原来的监听，因为indicator和bannerController都要设置监听。
 
                     binding.vp.setScrollSpeed()
                     binding.vp.adapter = MyBannerPagerAdapter(context, item.bannerList)
@@ -46,14 +47,37 @@ class MyLoadAfterAdapter(private val context: MainActivity, onLoadAfter: () -> U
 
                     // 设置轮播控制器
                     val bannerController = BannerController(context)
+                    if (!isRefresh(holder, item)) {// 如果不是刷新操作，就证明是滑出再滑进操作，那么就需要保留原来的position
+                        bannerController.setPosition(getPositionFromBannerControllerCache(holder))
+                    }
                     bannerController.setViewPager(binding.vp)
                         .setCycleInterval(3000L)
                         .play()
 
-                    mBannerControllers[holder] = bannerController
+                    mBannerControllerCaches[holder] = bannerController
+                    mDataCaches[holder] = item
                 }
             }
         }
+    }
+
+    /**
+     * 获取BannerController当前位置
+     */
+    private fun getPositionFromBannerControllerCache(holder: CommonViewHolder): Int =
+        mBannerControllerCaches[holder]?.getPosition() ?: -1
+
+    /**
+     * 是否是刷新操作
+     */
+    private fun isRefresh(holder: CommonViewHolder, item: IRecyclerViewItem?): Boolean {
+        if (mDataCaches.containsKey(holder)) {
+            val data = mDataCaches[holder]
+            if (data === item) {
+                return false
+            }
+        }
+        return true
     }
 
     private inline fun <reified T : IBannerIndicator> createBannerIndicator(
