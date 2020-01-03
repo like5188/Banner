@@ -1,7 +1,7 @@
 package com.like.banner
 
-import android.os.Handler
 import androidx.viewpager.widget.ViewPager
+import com.like.banner.utils.WeakHandler
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -27,8 +27,8 @@ class BannerController {
 
     private var mViewPager: BannerViewPager? = null
 
-    private val mCycleHandler: Handler by lazy {
-        Handler {
+    private val mCycleHandler: WeakHandler by lazy {
+        WeakHandler {
             if (mIsAutoPlaying.get() && mCycleInterval > 0 && mRealCount > 1) {
                 mViewPager?.let {
                     mCurPosition++

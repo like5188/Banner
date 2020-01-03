@@ -13,7 +13,6 @@ import com.like.livedatarecyclerview.viewholder.CommonViewHolder
 import com.ocnyang.pagetransformerhelp.cardtransformer.CascadingPageTransformer
 
 class MyLoadAfterAdapter(private val context: Context, onLoadAfter: () -> Unit) : BaseLoadAfterAdapter(onLoadAfter) {
-    private val mBannerController: BannerController by lazy { BannerController() }
 
     override fun bindOtherVariable(holder: CommonViewHolder, position: Int, item: IRecyclerViewItem?) {
         when (item) {
@@ -69,7 +68,7 @@ class MyLoadAfterAdapter(private val context: Context, onLoadAfter: () -> Unit) 
                     indicator.setViewPager(binding.vp)
 
                     // 设置轮播控制器
-                    mBannerController.setViewPager(binding.vp)
+                    BannerController().setViewPager(binding.vp)
                         .setCycleInterval(3000L)
                         .play()
                 }
