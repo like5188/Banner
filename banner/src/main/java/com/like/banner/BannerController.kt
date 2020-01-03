@@ -1,5 +1,6 @@
 package com.like.banner
 
+import android.util.Log
 import androidx.viewpager.widget.ViewPager
 import com.like.banner.utils.WeakHandler
 import java.util.concurrent.atomic.AtomicBoolean
@@ -44,6 +45,7 @@ class BannerController {
         // position当前选择的是哪个页面。注意：如果mCount=1，那么默认会显示第0页，此时不会触发此方法，只会触发onPageScrolled方法。
         override fun onPageSelected(position: Int) {
             mCurPosition = position
+            Log.d("tag", "BannerController onPageSelected mViewPager=${mViewPager.hashCode()} position=$position")
         }
 
         // position表示目标位置，positionOffset表示偏移的百分比，positionOffsetPixels表示偏移的像素

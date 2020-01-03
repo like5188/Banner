@@ -19,6 +19,8 @@ class MyLoadAfterAdapter(private val context: Context, onLoadAfter: () -> Unit) 
             is BannerInfo -> {
                 if (holder.binding is ViewBannerBinding && item.bannerList.isNotEmpty()) {
                     val binding = holder.binding as ViewBannerBinding
+                    if (binding.vp.adapter != null) return
+
                     binding.vp.setScrollSpeed()
                     binding.vp.adapter = MyBannerPagerAdapter(context, item.bannerList)
                     binding.vp.pageMargin = DimensionUtils.dp2px(context, 10f)
