@@ -3,7 +3,8 @@ package com.like.banner.sample
 import android.content.Context
 import android.graphics.Color
 import com.like.banner.BannerController
-import com.like.banner.indicator.*
+import com.like.banner.indicator.IBannerIndicator
+import com.like.banner.indicator.StickyRoundRectIndicator
 import com.like.banner.sample.databinding.ViewBannerBinding
 import com.like.banner.utils.DimensionUtils
 import com.like.livedatarecyclerview.adapter.BaseLoadAfterAdapter
@@ -64,7 +65,7 @@ class MyLoadAfterAdapter(private val context: Context, onLoadAfter: () -> Unit) 
                         )
                     )
 
-                    indicator.setIndicatorHeight(10f)
+                    indicator.setIndicatorHeight(6f)
                     indicator.setViewPager(binding.vp)
 
                     // 设置轮播控制器

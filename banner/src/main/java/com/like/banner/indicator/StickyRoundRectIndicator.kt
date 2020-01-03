@@ -62,9 +62,9 @@ class StickyRoundRectIndicator(
 
         // 确定不随滚动而改变的
         mTransitionalRect1.top = 0f
-        mTransitionalRect1.bottom = height
+        mTransitionalRect1.bottom = indicatorHeight.toFloat()
         mTransitionalRect2.top = 0f
-        mTransitionalRect2.bottom = height
+        mTransitionalRect2.bottom = indicatorHeight.toFloat()
 
         // 计算所有占位矩形
         var startLeft = left + mIndicatorPaddingPx / 2f
@@ -73,7 +73,7 @@ class StickyRoundRectIndicator(
             rect.left = startLeft
             rect.top = 0f
             rect.right = startLeft + mIndicatorWidthPx
-            rect.bottom = height
+            rect.bottom = indicatorHeight.toFloat()
             mPositions.add(rect)
             startLeft = rect.right + mIndicatorPaddingPx
         }
