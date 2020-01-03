@@ -60,8 +60,10 @@ class MyLoadAfterDataSourceImpl(
         val footers = mutableListOf<IFooter>()
         footers.add(Footer(ObservableInt(0)))
 
-        if (headers.isNotEmpty())
+        if (headers.isNotEmpty()) {
             result.addAll(headers)
+            result.addAll(headers)
+        }
         result.addAll(items)
         result.addAll(footers)
         return result

@@ -1,6 +1,5 @@
 package com.like.banner.indicator
 
-import android.util.Log
 import androidx.viewpager.widget.ViewPager
 import com.like.banner.BannerPagerAdapter
 import com.like.banner.BannerViewPager
@@ -38,7 +37,6 @@ interface IBannerIndicator {
 
                 override fun onPageSelected(position: Int) {
                     this@IBannerIndicator.onPageSelected(getRealPosition(position))
-                    Log.i("tag", "IBannerIndicator onPageSelected mViewPager=${viewPager.hashCode()} position=$position")
                 }
             })
         }
