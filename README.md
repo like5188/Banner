@@ -23,6 +23,10 @@
 在Module的gradle中加入：
 ```groovy
     dependencies {
+        implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2'
+        implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.2'
+        implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.2.0-rc03'// Activity 或 Fragment 对协程的支持：lifecycleScope
+
         implementation 'com.github.like5188:Banner:版本号'
     }
 ```
