@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.like.banner.sample.databinding.ActivityMainBinding
 import com.like.common.util.map
-import com.like.livedatarecyclerview.adapter.BaseAdapter
 import com.like.livedatarecyclerview.layoutmanager.WrapLinearLayoutManager
 import com.like.repository.requesthelper.*
 
@@ -22,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: MyViewModel by lazy {
         ViewModelProviders.of(this, MyViewModel.Factory()).get(MyViewModel::class.java)
     }
+    private var mAdapter: MyLoadAfterAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,20 +35,19 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.getResult().liveValue.observe(this, Observer {
             val statusReport = viewModel.getResult().liveStatus.value
-            var adapter: BaseAdapter? = null
             when {
                 (statusReport?.type is Initial || statusReport?.type is Refresh) && statusReport.status is Success -> {
-                    adapter = MyLoadAfterAdapter(this) { viewModel.loadAfter() }
-                    recyclerView.adapter = adapter
-                    adapter.mAdapterDataManager.clearAndAdd(it)
+                    mAdapter = MyLoadAfterAdapter(this) { viewModel.loadAfter() }
+                    recyclerView.adapter = mAdapter
+                    mAdapter?.mAdapterDataManager?.clearAndAdd(it)
                 }
                 statusReport?.type is After && statusReport.status is Success -> {
-                    adapter?.mAdapterDataManager?.getFooters()?.forEach { iFooter ->
+                    mAdapter?.mAdapterDataManager?.getFooters()?.forEach { iFooter ->
                         if (iFooter is Footer) {
                             iFooter.status.set(0)
                         }
                     }
-                    adapter?.mAdapterDataManager?.addItemsToEnd(it.map())
+                    mAdapter?.mAdapterDataManager?.addItemsToEnd(it.map())
                 }
             }
         })
@@ -83,6 +82,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mAdapter?.destroyBanners()
     }
 
 }

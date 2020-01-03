@@ -15,6 +15,12 @@ import com.ocnyang.pagetransformerhelp.cardtransformer.CascadingPageTransformer
 class MyLoadAfterAdapter(private val context: Context, onLoadAfter: () -> Unit) : BaseLoadAfterAdapter(onLoadAfter) {
     private val mBannerControllers = mutableMapOf<CommonViewHolder, BannerController>()
 
+    fun destroyBanners() {
+        mBannerControllers.forEach {
+            it.value.pause()
+        }
+    }
+
     override fun onViewAttachedToWindow(holder: CommonViewHolder) {
         super.onViewAttachedToWindow(holder)
         if (mBannerControllers.containsKey(holder)) {
