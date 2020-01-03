@@ -1,9 +1,9 @@
 package com.like.banner.sample
 
 import android.graphics.Color
+import android.view.ViewGroup
 import com.like.banner.BannerController
-import com.like.banner.indicator.IBannerIndicator
-import com.like.banner.indicator.StickyRoundRectIndicator
+import com.like.banner.indicator.*
 import com.like.banner.sample.databinding.ViewBannerBinding
 import com.like.banner.utils.DimensionUtils
 import com.like.livedatarecyclerview.adapter.BaseLoadAfterAdapter
@@ -40,46 +40,7 @@ class MyLoadAfterAdapter(private val context: MainActivity, onLoadAfter: () -> U
                     binding.vp.pageMargin = DimensionUtils.dp2px(context, 10f)
                     binding.vp.setPageTransformer(true, CascadingPageTransformer())
 
-                    // 设置指示器
-//                    val indicator: IBannerIndicator = TextIndicator(context, item.bannerList.size, binding.indicatorContainer).apply {
-//                        setTextSize(12f)
-//                        setTextColor(Color.WHITE)
-//                        setBackgroundColor(Color.GRAY)
-//                    }
-//                    val indicator: IBannerIndicator = ImageIndicator(
-//                        context,
-//                        item.bannerList.size,
-//                        binding.indicatorContainer,
-//                        10f,
-//                        listOf(R.drawable.store_point2),
-//                        listOf(R.drawable.store_point1)
-//                    )
-//                    val indicator: IBannerIndicator = StickyDotBezierCurveIndicator(
-//                        context,
-//                        item.bannerList.size,
-//                        binding.indicatorContainer,
-//                        20f,
-//                        Color.GRAY,
-//                        listOf(
-//                            Color.parseColor("#ff4a42"),
-//                            Color.parseColor("#fcde64"),
-//                            Color.parseColor("#73e8f4")
-//                        )
-//                    )
-                    val indicator: IBannerIndicator = StickyRoundRectIndicator(
-                        context,
-                        item.bannerList.size,
-                        binding.indicatorContainer,
-                        20f,
-                        10f,
-                        Color.GRAY,
-                        listOf(
-                            Color.parseColor("#ff4a42"),
-                            Color.parseColor("#fcde64"),
-                            Color.parseColor("#73e8f4")
-                        )
-                    )
-
+                    val indicator: StickyRoundRectIndicator = createBannerIndicator(item.bannerList.size, binding.indicatorContainer)
                     indicator.setIndicatorHeight(6f)
                     indicator.setViewPager(binding.vp)
 
@@ -94,4 +55,36 @@ class MyLoadAfterAdapter(private val context: MainActivity, onLoadAfter: () -> U
             }
         }
     }
+
+    private inline fun <reified T : IBannerIndicator> createBannerIndicator(
+        mDataCount: Int,
+        mContainer: ViewGroup
+    ): T = when (T::class.java) {
+        TextIndicator::class.java -> {
+            TextIndicator(context, mDataCount, mContainer).apply {
+                setTextSize(12f)
+                setTextColor(Color.WHITE)
+                setBackgroundColor(Color.GRAY)
+            }
+        }
+        StickyDotBezierCurveIndicator::class.java -> {
+            StickyDotBezierCurveIndicator(
+                context, mDataCount, mContainer, 20f, Color.GRAY,
+                listOf(Color.parseColor("#ff4a42"), Color.parseColor("#fcde64"), Color.parseColor("#73e8f4"))
+            )
+        }
+        StickyRoundRectIndicator::class.java -> {
+            StickyRoundRectIndicator(
+                context, mDataCount, mContainer, 20f, 10f, Color.GRAY,
+                listOf(Color.parseColor("#ff4a42"), Color.parseColor("#fcde64"), Color.parseColor("#73e8f4"))
+            )
+        }
+        ImageIndicator::class.java -> {
+            ImageIndicator(
+                context, mDataCount, mContainer, 10f,
+                listOf(R.drawable.store_point2), listOf(R.drawable.store_point1)
+            )
+        }
+        else -> throw IllegalArgumentException("不支持的类型")
+    } as T
 }
