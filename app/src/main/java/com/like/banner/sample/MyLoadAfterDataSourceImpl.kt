@@ -62,7 +62,6 @@ class MyLoadAfterDataSourceImpl(
 
         if (headers.isNotEmpty()) {
             result.addAll(headers)
-            result.addAll(headers)
         }
         result.addAll(items)
         result.addAll(footers)
