@@ -13,6 +13,21 @@ import com.like.livedatarecyclerview.viewholder.CommonViewHolder
 import com.ocnyang.pagetransformerhelp.cardtransformer.CascadingPageTransformer
 
 class MyLoadAfterAdapter(private val context: Context, onLoadAfter: () -> Unit) : BaseLoadAfterAdapter(onLoadAfter) {
+    private val mBannerControllers = mutableMapOf<CommonViewHolder, BannerController>()
+
+    override fun onViewAttachedToWindow(holder: CommonViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        if (mBannerControllers.containsKey(holder)) {
+            mBannerControllers[holder]?.play()
+        }
+    }
+
+    override fun onViewDetachedFromWindow(holder: CommonViewHolder) {
+        super.onViewDetachedFromWindow(holder)
+        if (mBannerControllers.containsKey(holder)) {
+            mBannerControllers[holder]?.pause()
+        }
+    }
 
     override fun bindOtherVariable(holder: CommonViewHolder, position: Int, item: IRecyclerViewItem?) {
         when (item) {
@@ -70,9 +85,12 @@ class MyLoadAfterAdapter(private val context: Context, onLoadAfter: () -> Unit) 
                     indicator.setViewPager(binding.vp)
 
                     // 设置轮播控制器
-                    BannerController().setViewPager(binding.vp)
+                    val bannerController = BannerController()
+                    bannerController.setViewPager(binding.vp)
                         .setCycleInterval(3000L)
                         .play()
+
+                    mBannerControllers[holder] = bannerController
                 }
             }
         }
