@@ -21,7 +21,7 @@ class MyLoadAfterDataSourceImpl(
     NETWORK_EXECUTOR
 ) {
     override suspend fun onLoadInitial(isRefresh: Boolean, pageSize: Int): List<IRecyclerViewItem> {
-        delay(2000)
+        delay(1000)
         return getInitialData(0, 10)
     }
 
@@ -30,7 +30,7 @@ class MyLoadAfterDataSourceImpl(
     }
 
     override suspend fun onLoadAfter(page: Int, pageSize: Int): List<IRecyclerViewItem> {
-        delay(2000)
+        delay(1000)
         return getAfter(page, pageSize)
     }
 
