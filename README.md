@@ -34,20 +34,28 @@
     mBinding.vp.adapter = adapter
 
     // 指示器 com.like.banner.indicator.IBannerIndicator 的使用：
-    val indicator: IBannerIndicator = ImageIndicator(
-        this,
-        data.size,
-        mBinding.indicatorContainer,
+    val indicator: IBannerIndicator = StickyRoundRectIndicator(
+        context,
+        item.bannerList.size,
+        binding.indicatorContainer,
+        20f,
         10f,
-        listOf(R.drawable.store_point2),
-        listOf(R.drawable.store_point1)
+        Color.GRAY,
+        listOf(
+            Color.parseColor("#ff4a42"),
+            Color.parseColor("#fcde64"),
+            Color.parseColor("#73e8f4")
+        )
     )
-    indicator.setIndicatorHeight(20f)
-    indicator.setViewPager(mBinding.vp)// 调用 [setViewPager] 方法，和 [com.like.banner.BannerController] 设置同一个 [com.like.banner.BannerViewPager] 即可。
+    indicator.setIndicatorHeight(6f)
+    indicator.setViewPager(binding.vp)// 调用 [setViewPager] 方法，和 [com.like.banner.BannerController] 设置同一个 [com.like.banner.BannerViewPager] 即可。
 
     // 使用 com.like.banner.BannerController 控制自动播放
-    private val mBannerController: BannerController by lazy { BannerController() }
-    mBannerController.setViewPager(mBinding.vp)
+    val bannerController = BannerController()
+    bannerController.setViewPager(binding.vp)
         .setCycleInterval(3000L)
         .play()
+
+    // 释放资源，避免内存泄露。
+    bannerController.pause()
 ```
