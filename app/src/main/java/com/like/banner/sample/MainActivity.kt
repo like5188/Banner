@@ -16,15 +16,11 @@ import com.like.livedatarecyclerview.layoutmanager.WrapLinearLayoutManager
 import com.like.repository.requesthelper.*
 
 class MainActivity : AppCompatActivity() {
-
     private val mBinding: ActivityMainBinding by lazy {
         DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
     }
     private val viewModel: MyViewModel by lazy {
         ViewModelProviders.of(this, MyViewModel.Factory()).get(MyViewModel::class.java)
-    }
-    private val mAdapter: BaseAdapter by lazy {
-        MyLoadAfterAdapter(this) { viewModel.loadAfter() }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,20 +32,23 @@ class MainActivity : AppCompatActivity() {
 
     private fun initAdapter(recyclerView: RecyclerView) {
         recyclerView.layoutManager = WrapLinearLayoutManager(this)
-        recyclerView.adapter = mAdapter
+
         viewModel.getResult().liveValue.observe(this, Observer {
             val statusReport = viewModel.getResult().liveStatus.value
+            var adapter: BaseAdapter? = null
             when {
                 (statusReport?.type is Initial || statusReport?.type is Refresh) && statusReport.status is Success -> {
-                    mAdapter.mAdapterDataManager.clearAndAdd(it)
+                    adapter = MyLoadAfterAdapter(this) { viewModel.loadAfter() }
+                    recyclerView.adapter = adapter
+                    adapter.mAdapterDataManager.clearAndAdd(it)
                 }
                 statusReport?.type is After && statusReport.status is Success -> {
-                    mAdapter.mAdapterDataManager.getFooters().forEach { iFooter ->
+                    adapter?.mAdapterDataManager?.getFooters()?.forEach { iFooter ->
                         if (iFooter is Footer) {
                             iFooter.status.set(0)
                         }
                     }
-                    mAdapter.mAdapterDataManager.addItemsToEnd(it.map())
+                    adapter?.mAdapterDataManager?.addItemsToEnd(it.map())
                 }
             }
         })
