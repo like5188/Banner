@@ -5,13 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.Interpolator
 import android.widget.Scroller
-import android.widget.ViewFlipper
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.like.banner.indicator.IBannerIndicator
@@ -70,7 +68,6 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
         override fun onPageSelected(position: Int) {
             mCurPosition = position
             mBannerIndicator?.onPageSelected(getRealPosition(position))
-            Log.i("BannerViewPager", "onPageSelected position=$position")
         }
 
         // position表示目标位置，positionOffset表示偏移的百分比，positionOffsetPixels表示偏移的像素
@@ -79,7 +76,6 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
         }
 
         override fun onPageScrollStateChanged(state: Int) {
-            Log.w("BannerViewPager", "onPageScrollStateChanged state=$state")
             when (state) {
                 SCROLL_STATE_IDLE -> {// 页面停止在了某页，有可能是手指滑动一页结束，有可能是自动滑动一页结束，开始自动播放。
                     play()
@@ -108,7 +104,6 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
     }
 
     override fun setAdapter(adapter: PagerAdapter?) {
-        Log.e("BannerViewPager", "setAdapter")
         val oldData = (getAdapter() as? BannerPagerAdapter)?.getData()
         super.setAdapter(adapter)
         require(adapter is BannerPagerAdapter) { "adapter of viewPager must be com.like.banner.BannerPagerAdapter" }
@@ -130,7 +125,6 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
     }
 
     override fun onAttachedToWindow() {
-        Log.e("BannerViewPager", "onAttachedToWindow")
         super.onAttachedToWindow()
         // Listen for broadcasts related to user-presence
         val filter = IntentFilter()
@@ -143,7 +137,6 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
     }
 
     override fun onDetachedFromWindow() {
-        Log.e("BannerViewPager", "onDetachedFromWindow")
         super.onDetachedFromWindow()
         mVisible = false
         context.unregisterReceiver(mReceiver)
@@ -151,26 +144,22 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
     }
 
     override fun onWindowVisibilityChanged(visibility: Int) {
-        Log.e("BannerViewPager", "onWindowVisibilityChanged visibility=$visibility")
         super.onWindowVisibilityChanged(visibility)
         mVisible = visibility == View.VISIBLE
         updateRunning()
     }
 
     fun play() {
-        Log.e("BannerViewPager", "play")
         mStarted = true
         updateRunning()
     }
 
     fun stop() {
-        Log.e("BannerViewPager", "stop")
         mStarted = false
         updateRunning()
     }
 
     private fun updateRunning() {
-        Log.w("BannerViewPager", "updateRunning")
         val running = mVisible && mStarted && mUserPresent && mScrollable
         if (running != mRunning) {
             if (running) {
@@ -188,7 +177,6 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
     private val mFlipRunnable: Runnable = object : Runnable {
         override fun run() {
             if (mRunning) {
-                Log.v("BannerViewPager", "mFlipRunnable")
                 mCurPosition++
                 setCurrentItem(mCurPosition, true)
                 postDelayed(this, mCycleInterval.toLong())
