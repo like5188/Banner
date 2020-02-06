@@ -15,11 +15,12 @@ import androidx.viewpager.widget.ViewPager
 import com.like.banner.indicator.IBannerIndicator
 
 /**
- * 无限滚动轮播图，必须配合[BannerPagerAdapter]使用。
+ * 无限滚动轮播图[BannerViewPager]，必须配合[BannerPagerAdapter]使用。
  *
- * @attr ref android.R.styleable#BannerViewPager_height_width_ratio
- * @attr ref android.R.styleable#BannerViewPager_cycle_interval
- * @attr ref android.R.styleable#BannerViewPager_auto_start
+ * 自定义的属性包括：
+ * @attr ref android.R.styleable#BannerViewPager_height_width_ratio [mHeightWidthRatio]
+ * @attr ref android.R.styleable#BannerViewPager_cycle_interval     [mCycleInterval]
+ * @attr ref android.R.styleable#BannerViewPager_auto_start         [mAutoStart]
  */
 open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.viewpager.widget.ViewPager(context, attrs) {
     companion object {
@@ -36,7 +37,7 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
      */
     private var mCycleInterval: Int = DEFAULT_CIRCLE_INTERVAL
     /**
-     * 是否自动开始播放
+     * 是否自动开始播放，如果是，则不用再调用[play]
      */
     private var mAutoStart = false
 
@@ -59,6 +60,14 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
      */
     private var mBannerIndicator: IBannerIndicator? = null
 
+    /**
+     * 设置指示器。
+     * 库里默认实现了四种指示器：
+     * [com.like.banner.indicator.ImageIndicator]、
+     * [com.like.banner.indicator.StickyDotBezierCurveIndicator]、
+     * [com.like.banner.indicator.StickyRoundRectIndicator]、
+     * [com.like.banner.indicator.TextIndicator]
+     */
     fun setBannerIndicator(bannerIndicator: IBannerIndicator) {
         mBannerIndicator = bannerIndicator
     }

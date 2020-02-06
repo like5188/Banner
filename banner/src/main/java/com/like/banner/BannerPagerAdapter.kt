@@ -3,6 +3,9 @@ package com.like.banner
 import android.view.View
 import android.view.ViewGroup
 
+/**
+ * 无限滚动轮播图[BannerViewPager]的适配器。
+ */
 abstract class BannerPagerAdapter(private val mList: List<*>) : androidx.viewpager.widget.PagerAdapter() {
     internal fun getRealCount(): Int = mList.size
 
