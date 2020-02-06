@@ -15,27 +15,37 @@ import androidx.viewpager.widget.ViewPager
 import com.like.banner.indicator.IBannerIndicator
 
 /**
- * 可以控制是否左右滑动的ViewPager[.setScrollable]，默认不能滑动
+ * 无限滚动轮播图，必须配合[BannerPagerAdapter]使用。
+ *
+ * @attr ref android.R.styleable#BannerViewPager_height_width_ratio
+ * @attr ref android.R.styleable#BannerViewPager_cycle_interval
+ * @attr ref android.R.styleable#BannerViewPager_auto_start
  */
 open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.viewpager.widget.ViewPager(context, attrs) {
     companion object {
-        private const val DEFAULT_INTERVAL = 3000
+        private const val DEFAULT_HEIGHT_WIDTH_RATIO = 0.4f
+        private const val DEFAULT_CIRCLE_INTERVAL = 3000
     }
 
-    // 高宽比例
-    private var mHeightWidthRatio = 0f
+    /**
+     * 高宽比例，默认为0.4f
+     */
+    private var mHeightWidthRatio = DEFAULT_HEIGHT_WIDTH_RATIO
     /**
      * 循环的时间间隔，毫秒。如果<=0，表示不循环播放。默认3000L
      */
-    private var mCycleInterval: Int = DEFAULT_INTERVAL
+    private var mCycleInterval: Int = DEFAULT_CIRCLE_INTERVAL
+    /**
+     * 是否自动开始播放
+     */
     private var mAutoStart = false
 
-    private var mRunning = false
-    private var mStarted = false
-    private var mVisible = false
-    private var mUserPresent = true
+    private var mRunning = false// 是否正在轮播
+    private var mStarted = false// 是否已经开始轮播
+    private var mVisible = false// ViewPager是否可见
+    private var mUserPresent = true// 手机屏幕对用户是否可见
 
-    private var mScrollable = false
+    private var mScrollable = false// 是否可以滚动
     /**
      * 真实的数据条数
      */
@@ -44,6 +54,9 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
      * ViewPager的当前位置
      */
     private var mCurPosition = -1
+    /**
+     * 指示器
+     */
     private var mBannerIndicator: IBannerIndicator? = null
 
     fun setBannerIndicator(bannerIndicator: IBannerIndicator) {
@@ -91,10 +104,9 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
     }
 
     init {
-        // 获取高宽比例
         val a = context.obtainStyledAttributes(attrs, R.styleable.BannerViewPager)
-        mHeightWidthRatio = a.getFloat(R.styleable.BannerViewPager_height_width_ratio, 0f)
-        mCycleInterval = a.getInt(R.styleable.BannerViewPager_cycle_interval, DEFAULT_INTERVAL)
+        mHeightWidthRatio = a.getFloat(R.styleable.BannerViewPager_height_width_ratio, DEFAULT_HEIGHT_WIDTH_RATIO)
+        mCycleInterval = a.getInt(R.styleable.BannerViewPager_cycle_interval, DEFAULT_CIRCLE_INTERVAL)
         mAutoStart = a.getBoolean(R.styleable.BannerViewPager_auto_start, false)
         a.recycle()
         // 必须设置这个，否则在使用setPageTransformer()并配合android:clipChildren="false"来使用时，
@@ -111,10 +123,10 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
         removeOnPageChangeListener(mOnPageChangeListener)
         when {
             mRealCount == 1 -> { // 如果只有一个页面，就限制 ViewPager 不能手动滑动
-                setScrollable(false)// 如果不设置，那么即使viewpager在只有一个页面时不能滑动，但是还是会触发onPageScrolled、onPageScrollStateChanged方法
+                mScrollable = false// 如果不设置，那么即使viewpager在只有一个页面时不能滑动，但是还是会触发onPageScrolled、onPageScrollStateChanged方法
             }
             mRealCount > 1 -> {
-                setScrollable(true)
+                mScrollable = true
                 addOnPageChangeListener(mOnPageChangeListener)
                 if (!adapter.isSameData(oldData)) {// 如果不是相同的数据，证明是刷新操作，而不是RecyclerView的复用操作。
                     // 取余处理，避免默认值不能被 mDataCount 整除，从而不能让初始时在第0个位置。
@@ -197,10 +209,6 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
         super.onMeasure(widthMeasureSpec, hms)
     }
 
-    fun setScrollable(isScrollable: Boolean) {
-        this.mScrollable = isScrollable
-    }
-
     override fun onTouchEvent(ev: MotionEvent): Boolean {
         return mScrollable && super.onTouchEvent(ev)
     }
@@ -214,11 +222,11 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
      *
      * @param duration 默认300毫秒
      */
-    fun setScrollSpeed(duration: Int = 300) {
+    fun setScrollSpeed(duration: Int = 300, interpolator: Interpolator = AccelerateInterpolator()) {
         try {
             val field = ViewPager::class.java.getDeclaredField("mScroller")
             field.isAccessible = true
-            field.set(this, FixedSpeedScroller(context, AccelerateInterpolator(), duration))
+            field.set(this, FixedSpeedScroller(context, interpolator, duration))
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -227,7 +235,7 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
     /**
      * 加速滚动的Scroller
      */
-    class FixedSpeedScroller(context: Context, interpolator: Interpolator, private val mDuration: Int) :
+    private class FixedSpeedScroller(context: Context, interpolator: Interpolator, private val mDuration: Int) :
         Scroller(context.applicationContext, interpolator) {
 
         override fun startScroll(startX: Int, startY: Int, dx: Int, dy: Int) {
