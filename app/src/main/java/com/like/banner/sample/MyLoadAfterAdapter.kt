@@ -12,22 +12,7 @@ import com.like.livedatarecyclerview.viewholder.CommonViewHolder
 import com.ocnyang.pagetransformerhelp.cardtransformer.CascadingPageTransformer
 
 class MyLoadAfterAdapter(private val context: MainActivity, onLoadAfter: () -> Unit) : BaseLoadAfterAdapter(onLoadAfter) {
-    private val mBannerControllerCaches = mutableMapOf<CommonViewHolder, BannerController>()
     private val mDataCaches = mutableMapOf<CommonViewHolder, IRecyclerViewItem?>()
-
-    override fun onViewAttachedToWindow(holder: CommonViewHolder) {
-        super.onViewAttachedToWindow(holder)
-        if (mBannerControllerCaches.containsKey(holder)) {
-            mBannerControllerCaches[holder]?.play()
-        }
-    }
-
-    override fun onViewDetachedFromWindow(holder: CommonViewHolder) {
-        super.onViewDetachedFromWindow(holder)
-        if (mBannerControllerCaches.containsKey(holder)) {
-            mBannerControllerCaches[holder]?.pause()
-        }
-    }
 
     override fun bindOtherVariable(holder: CommonViewHolder, position: Int, item: IRecyclerViewItem?) {
         when (item) {
@@ -48,13 +33,13 @@ class MyLoadAfterAdapter(private val context: MainActivity, onLoadAfter: () -> U
                     // 设置轮播控制器
                     val bannerController = BannerController(context)
                     if (!isRefresh(holder, item)) {// 如果不是刷新操作，就证明是滑出再滑进操作，那么就需要保留原来的position
-                        bannerController.setPosition(getPositionFromBannerControllerCache(holder))
+                        val oldPosition = binding.vp.mBannerController?.getPosition() ?: 0
+                        bannerController.setPosition(oldPosition)
                     }
                     bannerController.setViewPager(binding.vp)
                         .setCycleInterval(3000L)
                         .play()
 
-                    mBannerControllerCaches[holder] = bannerController
                     mDataCaches[holder] = item
                 }
             }
@@ -62,53 +47,40 @@ class MyLoadAfterAdapter(private val context: MainActivity, onLoadAfter: () -> U
     }
 
     /**
-     * 获取BannerController当前位置
-     */
-    private fun getPositionFromBannerControllerCache(holder: CommonViewHolder): Int =
-        mBannerControllerCaches[holder]?.getPosition() ?: -1
-
-    /**
      * 是否是刷新操作
      */
     private fun isRefresh(holder: CommonViewHolder, item: IRecyclerViewItem?): Boolean {
-        if (mDataCaches.containsKey(holder)) {
-            val data = mDataCaches[holder]
-            if (data === item) {
-                return false
-            }
-        }
-        return true
+        val data = mDataCaches[holder] ?: return true
+        return data !== item
     }
 
-    private inline fun <reified T : IBannerIndicator> createBannerIndicator(
-        mDataCount: Int,
-        mContainer: ViewGroup
-    ): T = when (T::class.java) {
-        TextIndicator::class.java -> {
-            TextIndicator(context, mDataCount, mContainer).apply {
-                setTextSize(12f)
-                setTextColor(Color.WHITE)
-                setBackgroundColor(Color.GRAY)
+    private inline fun <reified T : IBannerIndicator> createBannerIndicator(mDataCount: Int, mContainer: ViewGroup): T =
+        when (T::class.java) {
+            TextIndicator::class.java -> {
+                TextIndicator(context, mDataCount, mContainer).apply {
+                    setTextSize(12f)
+                    setTextColor(Color.WHITE)
+                    setBackgroundColor(Color.GRAY)
+                }
             }
-        }
-        StickyDotBezierCurveIndicator::class.java -> {
-            StickyDotBezierCurveIndicator(
-                context, mDataCount, mContainer, 20f, Color.GRAY,
-                listOf(Color.parseColor("#ff4a42"), Color.parseColor("#fcde64"), Color.parseColor("#73e8f4"))
-            )
-        }
-        StickyRoundRectIndicator::class.java -> {
-            StickyRoundRectIndicator(
-                context, mDataCount, mContainer, 20f, 10f, Color.GRAY,
-                listOf(Color.parseColor("#ff4a42"), Color.parseColor("#fcde64"), Color.parseColor("#73e8f4"))
-            )
-        }
-        ImageIndicator::class.java -> {
-            ImageIndicator(
-                context, mDataCount, mContainer, 10f,
-                listOf(R.drawable.store_point2), listOf(R.drawable.store_point1)
-            )
-        }
-        else -> throw IllegalArgumentException("不支持的类型")
-    } as T
+            StickyDotBezierCurveIndicator::class.java -> {
+                StickyDotBezierCurveIndicator(
+                    context, mDataCount, mContainer, 20f, Color.GRAY,
+                    listOf(Color.parseColor("#ff4a42"), Color.parseColor("#fcde64"), Color.parseColor("#73e8f4"))
+                )
+            }
+            StickyRoundRectIndicator::class.java -> {
+                StickyRoundRectIndicator(
+                    context, mDataCount, mContainer, 20f, 10f, Color.GRAY,
+                    listOf(Color.parseColor("#ff4a42"), Color.parseColor("#fcde64"), Color.parseColor("#73e8f4"))
+                )
+            }
+            ImageIndicator::class.java -> {
+                ImageIndicator(
+                    context, mDataCount, mContainer, 10f,
+                    listOf(R.drawable.store_point2), listOf(R.drawable.store_point1)
+                )
+            }
+            else -> throw IllegalArgumentException("不支持的类型")
+        } as T
 }

@@ -75,6 +75,7 @@ class BannerController(private val mLifecycleOwner: LifecycleOwner) {
         val adapter = viewPager.adapter
         require(adapter is BannerPagerAdapter) { "adapter of viewPager must be com.like.banner.BannerPagerAdapter" }
         mRealCount = adapter.getRealCount()
+        viewPager.mBannerController = this
         mViewPager = viewPager
         when {
             mRealCount == 1 -> { // 如果只有一个页面，就限制 ViewPager 不能手动滑动

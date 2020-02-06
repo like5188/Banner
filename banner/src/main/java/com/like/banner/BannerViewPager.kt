@@ -16,6 +16,7 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) :
     private var isScrollable = false
     // 高宽比例
     private var mHeightWidthRatio = 0f
+    var mBannerController: BannerController? = null
 
     init {
         // 获取高宽比例
@@ -26,6 +27,16 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) :
         // 会发现由于没有缓存，导致每次都要初始化下一页，从而使得下一页的页面每次都是初始状态，不能达到setPageTransformer()的效果。
         // 如果有缓存的话，那么setPageTransformer()的动画效果就会作用于缓存的页面，从而正确显示效果。
         offscreenPageLimit = 3
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        mBannerController?.play()
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        mBannerController?.pause()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
