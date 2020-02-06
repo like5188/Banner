@@ -23,40 +23,33 @@
 在Module的gradle中加入：
 ```groovy
     dependencies {
-        implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2'
-        implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.2'
-        implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.2.0-rc03'// Activity 或 Fragment 对协程的支持：lifecycleScope
-
         implementation 'com.github.like5188:Banner:版本号'
     }
 ```
 
 2、使用
 ```java
-    // ViewPager的使用：直接在布局文件中使用com.like.banner.BannerViewPager。adapter使用com.like.banner.BannerPagerAdapter
-    val adapter: BannerPagerAdapter = MyBannerPagerAdapter(this, data)
-    mBinding.vp.adapter = adapter
+    ①在布局文件中添加：com.like.banner.BannerViewPager。
+        <com.like.banner.BannerViewPager
+            android:id="@+id/vp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:clipChildren="false"
+            app:auto_start="false"
+            app:cycle_interval="3000"
+            app:height_width_ratio="0.4" />
 
-    // 指示器 com.like.banner.indicator.IBannerIndicator 的使用：
-    val indicator: IBannerIndicator = StickyRoundRectIndicator(
-        context,
-        item.bannerList.size,
-        binding.indicatorContainer,
-        20f,
-        10f,
-        Color.GRAY,
-        listOf(
-            Color.parseColor("#ff4a42"),
-            Color.parseColor("#fcde64"),
-            Color.parseColor("#73e8f4")
-        )
-    )
-    indicator.setIndicatorHeight(6f)
-    indicator.setViewPager(binding.vp)// 调用 [setViewPager] 方法，和 [com.like.banner.BannerController] 设置同一个 [com.like.banner.BannerViewPager] 即可。
+    ②在代码中设置：
+        binding.vp.setScrollSpeed()
+        binding.vp.adapter = MyBannerPagerAdapter(context, item.bannerList)
+        binding.vp.pageMargin = DimensionUtils.dp2px(context, 10f)
+        binding.vp.setPageTransformer(true, CascadingPageTransformer())
 
-    // 使用 com.like.banner.BannerController 控制自动播放
-    val bannerController = BannerController()
-    bannerController.setViewPager(binding.vp)
-        .setCycleInterval(3000L)
-        .play()
+        val indicator: ImageIndicator = createBannerIndicator(item.bannerList.size, binding.indicatorContainer)
+        indicator.init(6f)
+        binding.vp.setBannerIndicator(indicator)
+
+        binding.vp.play()
 ```
