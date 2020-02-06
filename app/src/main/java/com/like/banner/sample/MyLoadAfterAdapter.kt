@@ -23,8 +23,8 @@ class MyLoadAfterAdapter(private val context: MainActivity, onLoadAfter: () -> U
                     binding.vp.pageMargin = DimensionUtils.dp2px(context, 10f)
                     binding.vp.setPageTransformer(true, CascadingPageTransformer())
 
-                    val indicator: StickyRoundRectIndicator = createBannerIndicator(item.bannerList.size, binding.indicatorContainer)
-                    indicator.setIndicatorHeight(6f)
+                    val indicator: ImageIndicator = createBannerIndicator(item.bannerList.size, binding.indicatorContainer)
+                    indicator.init(6f)
                     binding.vp.setBannerIndicator(indicator)
 
                     binding.vp.play()

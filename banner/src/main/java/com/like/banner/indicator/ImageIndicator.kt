@@ -40,7 +40,8 @@ class ImageIndicator(
         }
     }
 
-    override fun setIndicatorHeight(height: Float) {
+    override fun init(height: Float) {
+        if (mDataCount <= 1) return
         val indicatorHeight = DimensionUtils.dp2px(mContext, height)
         mContainer.removeAllViews()
         for (i in 0 until mDataCount) {

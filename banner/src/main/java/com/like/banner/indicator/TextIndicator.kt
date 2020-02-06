@@ -28,7 +28,8 @@ class TextIndicator(
         gravity = Gravity.CENTER
     }
 
-    override fun setIndicatorHeight(height: Float) {
+    override fun init(height: Float) {
+        if (mDataCount <= 1) return
         val indicatorHeight = DimensionUtils.dp2px(mContext, height)
         // 设置CircleTextView的宽高
         mCircleTextView.layoutParams = ViewGroup.LayoutParams(indicatorHeight, indicatorHeight)

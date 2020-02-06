@@ -54,7 +54,8 @@ class StickyRoundRectIndicator(
         require(mSelectedColors.isNotEmpty()) { "mSelectedColors 不能为空" }
     }
 
-    override fun setIndicatorHeight(height: Float) {
+    override fun init(height: Float) {
+        if (mDataCount <= 1) return
         val indicatorHeight = DimensionUtils.dp2px(mContext, height)
         // 设置本控制器的宽高
         val w = mIndicatorWidthPx * mDataCount + mIndicatorPaddingPx * mDataCount// 左右各留 mIndicatorPaddingPx/2 的位置，用于显示过渡动画

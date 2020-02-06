@@ -57,7 +57,8 @@ class StickyDotBezierCurveIndicator(
         require(mSelectedColors.isNotEmpty()) { "mSelectedColors 不能为空" }
     }
 
-    override fun setIndicatorHeight(height: Float) {
+    override fun init(height: Float) {
+        if (mDataCount <= 1) return
         val indicatorHeight = DimensionUtils.dp2px(mContext, height)
         // 计算最大最小圆点半径
         mMaxCircleRadius = indicatorHeight / 2f

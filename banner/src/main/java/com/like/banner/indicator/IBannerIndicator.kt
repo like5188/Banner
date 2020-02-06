@@ -1,8 +1,6 @@
 package com.like.banner.indicator
 
 import androidx.viewpager.widget.ViewPager
-import com.like.banner.BannerPagerAdapter
-import com.like.banner.BannerViewPager
 
 /**
  * Banner 的指示器基类。
@@ -10,9 +8,11 @@ import com.like.banner.BannerViewPager
 interface IBannerIndicator : ViewPager.OnPageChangeListener {
 
     /**
-     * 设置指示器的高度。dp
+     * 初始化指示器
+     *
+     * @param height    指示器的高度。dp
      */
-    fun setIndicatorHeight(height: Float)
+    fun init(height: Float)
 
     override fun onPageSelected(position: Int) {
     }
