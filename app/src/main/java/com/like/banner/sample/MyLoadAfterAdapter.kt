@@ -27,7 +27,7 @@ class MyLoadAfterAdapter(private val context: MainActivity, onLoadAfter: () -> U
                     indicator.setIndicatorHeight(6f)
                     binding.vp.setBannerIndicator(indicator)
 
-//                    binding.vp.play()
+                    binding.vp.play()
                 }
             }
         }
