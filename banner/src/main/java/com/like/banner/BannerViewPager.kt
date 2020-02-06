@@ -16,6 +16,7 @@ import com.like.banner.indicator.IBannerIndicator
 
 /**
  * 无限滚动轮播图[BannerViewPager]，必须配合[BannerPagerAdapter]使用。
+ * 自动轮播功能是仿照[android.widget.ViewFlipper]来实现的。
  *
  * 自定义的属性包括：
  * @attr ref android.R.styleable#BannerViewPager_height_width_ratio [mHeightWidthRatio]
