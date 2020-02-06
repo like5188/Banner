@@ -4,16 +4,26 @@ import android.view.View
 import android.view.ViewGroup
 
 abstract class BannerPagerAdapter(private val mList: List<*>) : androidx.viewpager.widget.PagerAdapter() {
-    fun getRealCount(): Int = mList.size
+    internal fun getRealCount(): Int = mList.size
 
-    fun getRealPosition(position: Int): Int = if (mList.isEmpty()) 0 else position % mList.size
+    /**
+     * 是否是相同的数据
+     * 如果不是，则说明是刷新操作。
+     * 如果是，则说明是RecyclerView的复用操作。
+     */
+    internal fun isSameData(list: List<*>?): Boolean {
+        return list == mList
+    }
+
+    internal fun getData() = mList
 
     final override fun getCount(): Int = Int.MAX_VALUE
 
     final override fun isViewFromObject(p0: View, p1: Any): Boolean = p0 == p1
 
     final override fun instantiateItem(container: ViewGroup, position: Int): Any {
-        val view = onInstantiateItem(getRealPosition(position))
+        val realPosition = if (mList.isEmpty()) 0 else position % mList.size
+        val view = onInstantiateItem(realPosition)
         container.addView(view)
         return view
     }

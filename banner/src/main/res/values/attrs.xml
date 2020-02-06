@@ -3,5 +3,7 @@
 
     <declare-styleable name="BannerViewPager">
         <attr name="height_width_ratio" format="float" />
+        <attr name="cycle_interval" format="integer" />
+        <attr name="auto_start" format="boolean" />
     </declare-styleable>
 </resources>
