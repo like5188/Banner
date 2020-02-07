@@ -61,6 +61,16 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
      */
     private var mBannerIndicator: IBannerIndicator? = null
 
+    private val mScrollRunnable: Runnable = object : Runnable {
+        override fun run() {
+            if (mRunning) {
+                mCurPosition++
+                setCurrentItem(mCurPosition, true)
+                postDelayed(this, mCycleInterval.toLong())
+            }
+        }
+    }
+
     /**
      * 设置指示器。
      * 库里默认实现了四种指示器：
@@ -188,21 +198,11 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
                 // 因为页面变化，所以setCurrentItem方法能触发onPageSelected、onPageScrolled方法，
                 // 但是不能触发 onPageScrollStateChanged，所以不会启动自动播放，由使用者手动开启自动播放
                 currentItem = mCurPosition
-                postDelayed(mFlipRunnable, mCycleInterval.toLong())
+                postDelayed(mScrollRunnable, mCycleInterval.toLong())
             } else {
-                removeCallbacks(mFlipRunnable)
+                removeCallbacks(mScrollRunnable)
             }
             mRunning = running
-        }
-    }
-
-    private val mFlipRunnable: Runnable = object : Runnable {
-        override fun run() {
-            if (mRunning) {
-                mCurPosition++
-                setCurrentItem(mCurPosition, true)
-                postDelayed(this, mCycleInterval.toLong())
-            }
         }
     }
 
