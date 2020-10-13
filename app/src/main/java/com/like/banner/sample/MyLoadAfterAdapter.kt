@@ -5,9 +5,9 @@ import android.view.ViewGroup
 import com.like.banner.indicator.*
 import com.like.banner.sample.databinding.ViewBannerBinding
 import com.like.banner.utils.DimensionUtils
-import com.like.livedatarecyclerview.adapter.BaseLoadAfterAdapter
-import com.like.livedatarecyclerview.model.IRecyclerViewItem
-import com.like.livedatarecyclerview.viewholder.CommonViewHolder
+import com.like.recyclerview.adapter.BaseLoadAfterAdapter
+import com.like.recyclerview.model.IRecyclerViewItem
+import com.like.recyclerview.viewholder.CommonViewHolder
 import com.ocnyang.pagetransformerhelp.cardtransformer.CascadingPageTransformer
 
 class MyLoadAfterAdapter(private val context: MainActivity, onLoadAfter: () -> Unit) : BaseLoadAfterAdapter(onLoadAfter) {

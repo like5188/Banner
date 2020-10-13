@@ -58,7 +58,7 @@ class TextIndicator(
     /**
      * 圆形TextView
      */
-    class CircleTextView(context: Context?) : AppCompatTextView(context, null, 0) {
+    class CircleTextView(context: Context) : AppCompatTextView(context, null, 0) {
         private val mBgPaint = Paint().apply {
             color = Color.RED
             isAntiAlias = true
