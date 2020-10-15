@@ -77,6 +77,6 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
-    implementation 'com.github.like5188:Common:6.0.2'
+    implementation 'com.github.like5188:Common:6.0.4'
     implementation project(':banner')
 }

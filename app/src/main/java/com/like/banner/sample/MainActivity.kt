@@ -6,7 +6,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.like.banner.sample.databinding.ActivityMainBinding
 import com.like.common.util.repository.RecyclerViewLoadType
-import com.like.common.util.repository.bindListResultToRecyclerViewWithProgress
+import com.like.common.util.repository.bindResultToRecyclerViewWithProgress
 import com.like.common.util.shortToastCenter
 import com.like.recyclerview.layoutmanager.WrapLinearLayoutManager
 
@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         mBinding.rv.layoutManager = WrapLinearLayoutManager(this)
         mBinding.rv.adapter = mAdapter
 
-        mViewModel.myLoadAfterResult.bindListResultToRecyclerViewWithProgress(
+        mViewModel.myLoadAfterResult.bindResultToRecyclerViewWithProgress(
             this, mAdapter, RecyclerViewLoadType.LoadAfter, mBinding.swipeRefreshLayout,
             {
                 it
