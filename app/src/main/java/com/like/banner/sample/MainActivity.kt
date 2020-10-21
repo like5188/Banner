@@ -4,11 +4,14 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.like.banner.sample.databinding.ActivityMainBinding
-import com.like.common.util.repository.RecyclerViewLoadType
-import com.like.common.util.repository.bindResultToRecyclerViewWithProgress
+import com.like.common.util.datasource.RecyclerViewLoadType
+import com.like.common.util.datasource.collectWithProgressForRecyclerView
 import com.like.common.util.shortToastCenter
+import com.like.datasource.RequestState
 import com.like.recyclerview.layoutmanager.WrapLinearLayoutManager
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private val mBinding: ActivityMainBinding by lazy {
@@ -26,15 +29,20 @@ class MainActivity : AppCompatActivity() {
         mBinding.rv.layoutManager = WrapLinearLayoutManager(this)
         mBinding.rv.adapter = mAdapter
 
-        mViewModel.myLoadAfterResult.bindResultToRecyclerViewWithProgress(
-            this, mAdapter, RecyclerViewLoadType.LoadAfter, mBinding.swipeRefreshLayout,
-            {
-                it
-            },
-            { requestType, throwable ->
-                shortToastCenter(throwable.message)
-            }
-        )
+        lifecycleScope.launch {
+            mViewModel.myLoadAfterResult.collectWithProgressForRecyclerView(
+                mAdapter, RecyclerViewLoadType.LoadAfter, mBinding.swipeRefreshLayout,
+                {
+                    it
+                },
+                {
+                    val state = it.state
+                    if (state is RequestState.Failed) {
+                        shortToastCenter(state.throwable.message)
+                    }
+                }
+            )
+        }
         mViewModel.myLoadAfterResult.initial()
     }
 

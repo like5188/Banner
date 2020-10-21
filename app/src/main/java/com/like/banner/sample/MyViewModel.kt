@@ -1,10 +1,9 @@
 package com.like.banner.sample
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 
 class MyViewModel : ViewModel() {
-    private val myLoadAfterDataSource = MyLoadAfterDataSource(viewModelScope)
+    private val myLoadAfterDataSource = MyLoadAfterDataSource()
     val myLoadAfterResult = myLoadAfterDataSource.result()
 
 }

@@ -1,16 +1,14 @@
 package com.like.banner.sample
 
+import com.like.datasource.RequestType
+import com.like.datasource.paging.byPageNo.PageNoKeyedPagingDataSource
+import com.like.datasource.util.MultiDataSourceHelper
 import com.like.recyclerview.model.IHeader
 import com.like.recyclerview.model.IItem
 import com.like.recyclerview.model.IRecyclerViewItem
-import com.like.repository.RequestType
-import com.like.repository.paging.byPageNo.PageNoKeyedPagingDataSource
-import com.like.repository.util.MultiDataSourceHelper
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 
-class MyLoadAfterDataSource(coroutineScope: CoroutineScope) :
-    PageNoKeyedPagingDataSource<List<IRecyclerViewItem>?>(coroutineScope, 10) {
+class MyLoadAfterDataSource : PageNoKeyedPagingDataSource<List<IRecyclerViewItem>?>(10) {
     private var i = 0
 
     override suspend fun load(requestType: RequestType, pageNo: Int, pageSize: Int): List<IRecyclerViewItem>? {
