@@ -9,7 +9,6 @@ import com.like.banner.sample.databinding.ActivityMainBinding
 import com.like.common.util.datasource.RecyclerViewLoadType
 import com.like.common.util.datasource.collectWithProgressForRecyclerView
 import com.like.common.util.shortToastCenter
-import com.like.datasource.RequestState
 import com.like.recyclerview.layoutmanager.WrapLinearLayoutManager
 import kotlinx.coroutines.launch
 
@@ -35,11 +34,8 @@ class MainActivity : AppCompatActivity() {
                 {
                     it
                 },
-                {
-                    val state = it.state
-                    if (state is RequestState.Failed) {
-                        shortToastCenter(state.throwable.message)
-                    }
+                { requestType, throwable ->
+                    shortToastCenter(throwable.message)
                 }
             )
         }
