@@ -5,10 +5,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.hjq.toast.ToastUtils
 import com.like.banner.sample.databinding.ActivityMainBinding
 import com.like.common.util.datasource.RecyclerViewLoadType
 import com.like.common.util.datasource.collectWithProgressForRecyclerView
-import com.like.common.util.shortToastCenter
 import com.like.recyclerview.layoutmanager.WrapLinearLayoutManager
 import kotlinx.coroutines.launch
 
@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
                     it
                 },
                 { requestType, throwable ->
-                    shortToastCenter(throwable.message)
+                    ToastUtils.show(throwable.message)
                 }
             )
         }
