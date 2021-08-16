@@ -1,29 +1,23 @@
 package com.like.banner.sample
 
-import com.like.datasource.RequestType
-import com.like.datasource.paging.byPageNo.PageNoKeyedPagingDataSource
-import com.like.datasource.util.MultiDataSourceHelper
-import com.like.recyclerview.model.IHeader
-import com.like.recyclerview.model.IItem
+import com.like.common.util.successIfAllSuccess
+import com.like.paging.RequestType
+import com.like.paging.dataSource.byPageNoKeyed.PageNoKeyedPagingDataSource
 import com.like.recyclerview.model.IRecyclerViewItem
 import kotlinx.coroutines.delay
 
-class MyLoadAfterDataSource : PageNoKeyedPagingDataSource<List<IRecyclerViewItem>?>(10) {
+class MyDataSource : PageNoKeyedPagingDataSource<List<List<IRecyclerViewItem>?>>(10) {
     private var i = 0
 
-    override suspend fun load(requestType: RequestType, pageNo: Int, pageSize: Int): List<IRecyclerViewItem>? {
-        return MultiDataSourceHelper.successIfAllSuccess(
-            requestType,
-            { getHeaders() },
-            pagingBlock = { getItems(pageNo, pageSize) }
-        )
+    override suspend fun load(requestType: RequestType, pageNo: Int, pageSize: Int): List<List<IRecyclerViewItem>?> {
+        return successIfAllSuccess(::getHeaders, { getItems(pageNo, pageSize) })
     }
 
     override fun getInitialPage(): Int {
         return 0
     }
 
-    private suspend fun getItems(page: Int, pageSize: Int): List<IItem> {
+    private suspend fun getItems(page: Int, pageSize: Int): List<IRecyclerViewItem> {
         delay(1000)
         val start = page * pageSize + 1
         val end = start + pageSize
@@ -36,8 +30,8 @@ class MyLoadAfterDataSource : PageNoKeyedPagingDataSource<List<IRecyclerViewItem
         }
     }
 
-    private fun getHeaders(): List<IHeader> {
-        val headers = mutableListOf<IHeader>()
+    private fun getHeaders(): List<IRecyclerViewItem> {
+        val headers = mutableListOf<IRecyclerViewItem>()
         val bannerInfo = BannerInfo()
         when (i++) {
             0 -> {

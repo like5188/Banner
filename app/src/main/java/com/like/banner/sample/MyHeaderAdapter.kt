@@ -5,32 +5,31 @@ import android.view.ViewGroup
 import com.like.banner.indicator.*
 import com.like.banner.sample.databinding.ViewBannerBinding
 import com.like.banner.utils.DimensionUtils
-import com.like.recyclerview.adapter.BaseLoadAfterAdapter
-import com.like.recyclerview.model.IRecyclerViewItem
-import com.like.recyclerview.viewholder.CommonViewHolder
+import com.like.recyclerview.adapter.BaseAdapter
+import com.like.recyclerview.viewholder.BindingViewHolder
 import com.ocnyang.pagetransformerhelp.cardtransformer.CascadingPageTransformer
 
-class MyLoadAfterAdapter(private val context: MainActivity, onLoadAfter: () -> Unit) : BaseLoadAfterAdapter(onLoadAfter) {
+class MyHeaderAdapter(private val context: MainActivity) : BaseAdapter<ViewBannerBinding, BannerInfo>() {
 
-    override fun onBindViewHolder(holder: CommonViewHolder, position: Int, item: IRecyclerViewItem?) {
-        super.onBindViewHolder(holder, position, item)
-        when (item) {
-            is BannerInfo -> {
-                val binding = holder.binding
-                if (binding is ViewBannerBinding && item.bannerList.isNotEmpty()) {
+    override fun onBindViewHolder(
+        holder: BindingViewHolder<ViewBannerBinding>,
+        binding: ViewBannerBinding,
+        position: Int,
+        item: BannerInfo
+    ) {
+        super.onBindViewHolder(holder, binding, position, item)
+        if (item.bannerList.isNotEmpty()) {
 
-                    binding.vp.setScrollSpeed()
-                    binding.vp.adapter = MyBannerPagerAdapter(context, item.bannerList)
-                    binding.vp.pageMargin = DimensionUtils.dp2px(context, 10f)
-                    binding.vp.setPageTransformer(true, CascadingPageTransformer())
+            binding.vp.setScrollSpeed()
+            binding.vp.adapter = MyBannerPagerAdapter(context, item.bannerList)
+            binding.vp.pageMargin = DimensionUtils.dp2px(context, 10f)
+            binding.vp.setPageTransformer(true, CascadingPageTransformer())
 
-                    val indicator: ImageIndicator = createBannerIndicator(item.bannerList.size, binding.indicatorContainer)
-                    indicator.init(6f)
-                    binding.vp.setBannerIndicator(indicator)
+            val indicator: ImageIndicator = createBannerIndicator(item.bannerList.size, binding.indicatorContainer)
+            indicator.init(6f)
+            binding.vp.setBannerIndicator(indicator)
 
-                    binding.vp.play()
-                }
-            }
+            binding.vp.play()
         }
     }
 

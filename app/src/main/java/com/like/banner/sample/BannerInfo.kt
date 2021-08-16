@@ -1,8 +1,8 @@
 package com.like.banner.sample
 
-import com.like.recyclerview.model.IHeader
+import com.like.recyclerview.model.IRecyclerViewItem
 
-class BannerInfo : IHeader {
+class BannerInfo : IRecyclerViewItem {
     val bannerList = mutableListOf<Banner>()
     override val layoutId: Int = R.layout.view_banner
 
