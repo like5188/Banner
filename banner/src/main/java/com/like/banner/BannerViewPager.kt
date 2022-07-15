@@ -33,10 +33,12 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
      * 高宽比例，默认为0.4f
      */
     private var mHeightWidthRatio = DEFAULT_HEIGHT_WIDTH_RATIO
+
     /**
      * 循环的时间间隔，毫秒。如果<=0，表示不循环播放。默认3000L
      */
     private var mCycleInterval: Int = DEFAULT_CIRCLE_INTERVAL
+
     /**
      * 是否自动开始播放，如果是，则不用再调用[play]
      */
@@ -48,14 +50,17 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
     private var mUserPresent = true// 手机屏幕对用户是否可见
 
     private var mScrollable = false// 是否可以滚动
+
     /**
      * 真实的数据条数
      */
     private var mRealCount = 0
+
     /**
      * ViewPager的当前位置
      */
     private var mCurPosition = -1
+
     /**
      * 指示器
      */
@@ -97,6 +102,7 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
     }
     private val mOnPageChangeListener = object : OnPageChangeListener {
         fun getRealPosition(position: Int): Int = position % mRealCount
+
         // position当前选择的是哪个页面。注意：如果mCount=1，那么默认会显示第0页，此时不会触发此方法，只会触发onPageScrolled方法。
         override fun onPageSelected(position: Int) {
             mCurPosition = position
@@ -181,6 +187,10 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
         updateRunning()
     }
 
+    /**
+     * 开始轮播
+     * 如果不需要循环轮播，则不要调此方法
+     */
     fun play() {
         mStarted = true
         updateRunning()

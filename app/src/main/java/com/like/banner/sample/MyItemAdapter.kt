@@ -7,7 +7,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 import com.like.banner.indicator.*
 import com.like.banner.sample.databinding.ViewBannerBinding
-import com.like.banner.utils.dp
+import com.like.common.util.dp
 import com.like.recyclerview.adapter.BaseListAdapter
 import com.like.recyclerview.model.IRecyclerViewItem
 import com.like.recyclerview.viewholder.BindingViewHolder
