@@ -17,6 +17,7 @@ import android.view.animation.DecelerateInterpolator
  * @param mContext
  * @param mDataCount            指示器的数量
  * @param mContainer            指示器的容器
+ * @param mIndicatorHeight      指示器的高度
  * @param mIndicatorPadding     指示器之间的间隔
  * @param mNormalColor          正常状态的指示器颜色
  * @param mSelectedColors       选中状态的指示器颜色，至少一个，少于[mDataCount]时，循环使用。
@@ -26,6 +27,7 @@ class StickyDotBezierCurveIndicator(
     private val mContext: Context,
     private val mDataCount: Int,
     private val mContainer: ViewGroup,
+    private val mIndicatorHeight: Int,
     private val mIndicatorPadding: Int,
     private val mNormalColor: Int,
     private val mSelectedColors: List<Int>
@@ -50,18 +52,20 @@ class StickyDotBezierCurveIndicator(
     private val mArgbEvaluator = ArgbEvaluator()
 
     init {
+        require(mDataCount > 0) { "mDataCount 必须大于0" }
+        require(mIndicatorHeight > 0) { "mIndicatorHeight 必须大于0" }
         require(mIndicatorPadding > 0) { "mIndicatorPadding 必须大于0" }
         require(mSelectedColors.isNotEmpty()) { "mSelectedColors 不能为空" }
+        init()
     }
 
-    override fun init(indicatorHeight: Int) {
-        if (mDataCount <= 1) return
+    private fun init() {
         // 计算最大最小圆点半径
-        mMaxCircleRadius = indicatorHeight / 2f
+        mMaxCircleRadius = mIndicatorHeight / 2f
         mMinCircleRadius = 1f
         // 设置本控制器的宽高
         val w = (mMaxCircleRadius * 2 * mDataCount + mIndicatorPadding * mDataCount).toInt()// 左右各留 mIndicatorPaddingPx/2 的位置，用于显示过渡动画
-        this@StickyDotBezierCurveIndicator.layoutParams = ViewGroup.LayoutParams(w, indicatorHeight)
+        this@StickyDotBezierCurveIndicator.layoutParams = ViewGroup.LayoutParams(w, mIndicatorHeight)
 
         // 确定不随滚动而改变的
         mCurTransitionalCircle1.centerY = mMaxCircleRadius
@@ -79,7 +83,6 @@ class StickyDotBezierCurveIndicator(
             mPositions.add(circle)
             startCenterX += mIndicatorPadding + mMaxCircleRadius * 2f
         }
-
         mContainer.removeAllViews()
         mContainer.addView(this@StickyDotBezierCurveIndicator)
     }

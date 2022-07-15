@@ -7,13 +7,6 @@ import androidx.viewpager.widget.ViewPager
  */
 interface IBannerIndicator : ViewPager.OnPageChangeListener {
 
-    /**
-     * 初始化指示器
-     *
-     * @param indicatorHeight   单个指示器的高度
-     */
-    fun init(indicatorHeight: Int)
-
     override fun onPageSelected(position: Int) {
     }
 

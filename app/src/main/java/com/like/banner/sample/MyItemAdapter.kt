@@ -52,7 +52,7 @@ class MyItemAdapter : BaseListAdapter<ViewDataBinding, IRecyclerViewItem>(
             binding.vp.pageMargin = 10.dp
             binding.vp.setPageTransformer(true, CascadingPageTransformer())
 
-            val indicator: StickyDotBezierCurveIndicator = createBannerIndicator(context, item.bannerList.size, binding.indicatorContainer)
+            val indicator: ImageIndicator = createBannerIndicator(context, item.bannerList.size, binding.indicatorContainer)
             binding.vp.setBannerIndicator(indicator)
             binding.vp.play()// 如果不需要自动轮播，则不调用此方法即可
         }
@@ -61,37 +61,29 @@ class MyItemAdapter : BaseListAdapter<ViewDataBinding, IRecyclerViewItem>(
     private inline fun <reified T : IBannerIndicator> createBannerIndicator(context: Context, mDataCount: Int, mContainer: ViewGroup): T =
         when (T::class.java) {
             TextIndicator::class.java -> {
-                TextIndicator(context, mDataCount, mContainer).apply {
+                TextIndicator(context, mDataCount, mContainer, 24.dp).apply {
                     setTextSize(12f)
                     setTextColor(Color.WHITE)
                     setBackgroundColor(Color.GRAY)
-                }.apply {
-                    init(24.dp)
                 }
             }
             StickyDotBezierCurveIndicator::class.java -> {
                 StickyDotBezierCurveIndicator(
-                    context, mDataCount, mContainer, 20.dp, Color.GRAY,
+                    context, mDataCount, mContainer, 10.dp, 20.dp, Color.GRAY,
                     listOf(Color.parseColor("#ff4a42"), Color.parseColor("#fcde64"), Color.parseColor("#73e8f4"))
-                ).apply {
-                    init(10.dp)
-                }
+                )
             }
             StickyRoundRectIndicator::class.java -> {
                 StickyRoundRectIndicator(
-                    context, mDataCount, mContainer, 20.dp, 10.dp, Color.GRAY,
+                    context, mDataCount, mContainer, 20.dp, 10.dp, 10.dp, Color.GRAY,
                     listOf(Color.parseColor("#ff4a42"), Color.parseColor("#fcde64"), Color.parseColor("#73e8f4"))
-                ).apply {
-                    init(10.dp)
-                }
+                )
             }
             ImageIndicator::class.java -> {
                 ImageIndicator(
-                    context, mDataCount, mContainer, 10.dp,
+                    context, mDataCount, mContainer, 10.dp, 10.dp,
                     listOf(R.drawable.store_point2), listOf(R.drawable.store_point1)
-                ).apply {
-                    init(10.dp)
-                }
+                )
             }
             else -> throw IllegalArgumentException("不支持的类型")
         } as T

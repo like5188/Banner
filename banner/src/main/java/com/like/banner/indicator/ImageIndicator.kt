@@ -12,6 +12,7 @@ import android.widget.LinearLayout
  * @param mContext
  * @param mDataCount                指示器的数量
  * @param mContainer                指示器的容器
+ * @param mIndicatorHeight          指示器的高度
  * @param mIndicatorPadding         指示器之间的间隔
  * @param mNormalIndicatorResIds    正常状态的指示器图片资源id，至少一个，图片少于[mDataCount]时，循环使用。
  * @param mSelectedIndicatorResIds  选中状态的指示器图片资源id，至少一个，图片少于[mDataCount]时，循环使用。
@@ -20,6 +21,7 @@ class ImageIndicator(
     private val mContext: Context,
     private val mDataCount: Int,
     private val mContainer: ViewGroup,
+    private val mIndicatorHeight: Int,
     private val mIndicatorPadding: Int,
     private val mNormalIndicatorResIds: List<Int>,
     private val mSelectedIndicatorResIds: List<Int>
@@ -27,6 +29,8 @@ class ImageIndicator(
     private var mPreSelectedPosition = 0
 
     init {
+        require(mDataCount > 0) { "mDataCount 必须大于0" }
+        require(mIndicatorHeight > 0) { "mIndicatorHeight 必须大于0" }
         require(mIndicatorPadding > 0) { "mIndicatorPadding 必须大于0" }
         require(mNormalIndicatorResIds.isNotEmpty()) { "mNormalIndicatorResIds 不能为空" }
         mNormalIndicatorResIds.forEach {
@@ -36,14 +40,14 @@ class ImageIndicator(
         mSelectedIndicatorResIds.forEach {
             require(it > 0) { "mSelectedIndicatorResIds 中的图片资源 id 无效" }
         }
+        init()
     }
 
-    override fun init(indicatorHeight: Int) {
-        if (mDataCount <= 1) return
+    private fun init() {
         mContainer.removeAllViews()
         for (i in 0 until mDataCount) {
             // 加载指示器图片
-            val params = LinearLayout.LayoutParams(indicatorHeight, indicatorHeight)// 设置指示器宽高
+            val params = LinearLayout.LayoutParams(mIndicatorHeight, mIndicatorHeight)// 设置指示器宽高
             val iv = ImageView(mContext)
             iv.scaleType = ImageView.ScaleType.FIT_CENTER
             if (i == 0) {
@@ -59,7 +63,6 @@ class ImageIndicator(
     }
 
     override fun onPageSelected(position: Int) {
-        if (mDataCount <= 0) return
         mContainer.getChildAt(mPreSelectedPosition).setBackgroundResource(getNormalIndicatorResId(mPreSelectedPosition))
         mContainer.getChildAt(position).setBackgroundResource(getSelectedIndicatorResId(position))
         mPreSelectedPosition = position
