@@ -56,7 +56,7 @@ class MyItemAdapter : BaseListAdapter<ViewDataBinding, IRecyclerViewItem>(
             indicator.init(6f)
             binding.vp.setBannerIndicator(indicator)
 
-            binding.vp.play()
+            binding.vp.play()// 如果不需要自动轮播，则不调用此方法即可
         }
     }
 
