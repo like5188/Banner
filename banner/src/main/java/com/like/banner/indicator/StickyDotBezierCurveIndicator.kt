@@ -50,7 +50,7 @@ class StickyDotBezierCurveIndicator(
     private val mArgbEvaluator = ArgbEvaluator()
 
     init {
-        require(mIndicatorPadding > 0) { "indicatorPadding 必须大于0" }
+        require(mIndicatorPadding > 0) { "mIndicatorPadding 必须大于0" }
         require(mSelectedColors.isNotEmpty()) { "mSelectedColors 不能为空" }
     }
 

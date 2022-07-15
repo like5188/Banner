@@ -27,7 +27,7 @@ class ImageIndicator(
     private var mPreSelectedPosition = 0
 
     init {
-        require(mIndicatorPadding > 0) { "indicatorPadding 必须大于0" }
+        require(mIndicatorPadding > 0) { "mIndicatorPadding 必须大于0" }
         require(mNormalIndicatorResIds.isNotEmpty()) { "mNormalIndicatorResIds 不能为空" }
         mNormalIndicatorResIds.forEach {
             require(it > 0) { "mNormalIndicatorResIds 中的图片资源 id 无效" }
