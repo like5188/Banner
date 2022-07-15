@@ -7,7 +7,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 import com.like.banner.indicator.*
 import com.like.banner.sample.databinding.ViewBannerBinding
-import com.like.banner.utils.DimensionUtils
+import com.like.banner.utils.dp
 import com.like.recyclerview.adapter.BaseListAdapter
 import com.like.recyclerview.model.IRecyclerViewItem
 import com.like.recyclerview.viewholder.BindingViewHolder
@@ -49,11 +49,11 @@ class MyItemAdapter : BaseListAdapter<ViewDataBinding, IRecyclerViewItem>(
         if (item.bannerList.isNotEmpty()) {
             binding.vp.setScrollSpeed()
             binding.vp.adapter = MyBannerPagerAdapter(context, item.bannerList)
-            binding.vp.pageMargin = DimensionUtils.dp2px(context, 10f)
+            binding.vp.pageMargin = 10.dp
             binding.vp.setPageTransformer(true, CascadingPageTransformer())
 
             val indicator: ImageIndicator = createBannerIndicator(context, item.bannerList.size, binding.indicatorContainer)
-            indicator.init(6f)
+            indicator.init(6.dp)
             binding.vp.setBannerIndicator(indicator)
 
             binding.vp.play()// 如果不需要自动轮播，则不调用此方法即可
@@ -71,19 +71,19 @@ class MyItemAdapter : BaseListAdapter<ViewDataBinding, IRecyclerViewItem>(
             }
             StickyDotBezierCurveIndicator::class.java -> {
                 StickyDotBezierCurveIndicator(
-                    context, mDataCount, mContainer, 20f, Color.GRAY,
+                    context, mDataCount, mContainer, 20.dp, Color.GRAY,
                     listOf(Color.parseColor("#ff4a42"), Color.parseColor("#fcde64"), Color.parseColor("#73e8f4"))
                 )
             }
             StickyRoundRectIndicator::class.java -> {
                 StickyRoundRectIndicator(
-                    context, mDataCount, mContainer, 20f, 10f, Color.GRAY,
+                    context, mDataCount, mContainer, 20.dp, 10.dp, Color.GRAY,
                     listOf(Color.parseColor("#ff4a42"), Color.parseColor("#fcde64"), Color.parseColor("#73e8f4"))
                 )
             }
             ImageIndicator::class.java -> {
                 ImageIndicator(
-                    context, mDataCount, mContainer, 10f,
+                    context, mDataCount, mContainer, 10.dp,
                     listOf(R.drawable.store_point2), listOf(R.drawable.store_point1)
                 )
             }

@@ -10,29 +10,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
-import com.like.banner.utils.DimensionUtils
 
 /**
  * 粘性圆点贝塞尔曲线指示器
  *
  * @param mContext
- * @param mDataCount        指示器的数量
- * @param mContainer        指示器的容器
- * @param indicatorPadding  指示器之间的间隔，单位 dp
- * @param mNormalColor       正常状态的指示器颜色
- * @param mSelectedColors   选中状态的指示器颜色，至少一个，少于[mDataCount]时，循环使用。
+ * @param mDataCount            指示器的数量
+ * @param mContainer            指示器的容器
+ * @param mIndicatorPadding     指示器之间的间隔
+ * @param mNormalColor          正常状态的指示器颜色
+ * @param mSelectedColors       选中状态的指示器颜色，至少一个，少于[mDataCount]时，循环使用。
  */
 @SuppressLint("ViewConstructor")
 class StickyDotBezierCurveIndicator(
     private val mContext: Context,
     private val mDataCount: Int,
     private val mContainer: ViewGroup,
-    indicatorPadding: Float,
+    private val mIndicatorPadding: Int,
     private val mNormalColor: Int,
     private val mSelectedColors: List<Int>
 ) : View(mContext), IBannerIndicator {
-    private val mIndicatorPaddingPx: Int = DimensionUtils.dp2px(mContext, indicatorPadding)// 指示器之间的间隔
-
     private val mPositions = mutableListOf<Circle>()// 占位圆点
 
     private var mMaxCircleRadius: Float = 0f// 最大圆点半径
@@ -53,18 +50,17 @@ class StickyDotBezierCurveIndicator(
     private val mArgbEvaluator = ArgbEvaluator()
 
     init {
-        require(mIndicatorPaddingPx > 0) { "indicatorPadding 必须大于0" }
+        require(mIndicatorPadding > 0) { "indicatorPadding 必须大于0" }
         require(mSelectedColors.isNotEmpty()) { "mSelectedColors 不能为空" }
     }
 
-    override fun init(height: Float) {
+    override fun init(indicatorHeight: Int) {
         if (mDataCount <= 1) return
-        val indicatorHeight = DimensionUtils.dp2px(mContext, height)
         // 计算最大最小圆点半径
         mMaxCircleRadius = indicatorHeight / 2f
         mMinCircleRadius = 1f
         // 设置本控制器的宽高
-        val w = (mMaxCircleRadius * 2 * mDataCount + mIndicatorPaddingPx * mDataCount).toInt()// 左右各留 mIndicatorPaddingPx/2 的位置，用于显示过渡动画
+        val w = (mMaxCircleRadius * 2 * mDataCount + mIndicatorPadding * mDataCount).toInt()// 左右各留 mIndicatorPaddingPx/2 的位置，用于显示过渡动画
         this@StickyDotBezierCurveIndicator.layoutParams = ViewGroup.LayoutParams(w, indicatorHeight)
 
         // 确定不随滚动而改变的
@@ -74,14 +70,14 @@ class StickyDotBezierCurveIndicator(
         mNextTransitionalCircle2.centerY = mMaxCircleRadius
 
         // 计算所有占位圆点
-        var startCenterX = left + mIndicatorPaddingPx / 2 + mMaxCircleRadius
+        var startCenterX = left + mIndicatorPadding / 2 + mMaxCircleRadius
         for (i in 0 until mDataCount) {
             val circle = Circle()
             circle.centerX = startCenterX
             circle.centerY = mMaxCircleRadius
             circle.radius = mMaxCircleRadius
             mPositions.add(circle)
-            startCenterX += mIndicatorPaddingPx + mMaxCircleRadius * 2f
+            startCenterX += mIndicatorPadding + mMaxCircleRadius * 2f
         }
 
         mContainer.removeAllViews()
@@ -175,7 +171,7 @@ class StickyDotBezierCurveIndicator(
             mArgbEvaluator.evaluate(positionOffset, currentColor, nextColor).toString().toInt()
 
         // 计算过渡圆点，它们的centerX和radius都是不断变化的。
-        val distance = mMaxCircleRadius * 2f + mIndicatorPaddingPx// 两圆点圆心之间的距离
+        val distance = mMaxCircleRadius * 2f + mIndicatorPadding// 两圆点圆心之间的距离
         val currentCircleX = mPositions[position].centerX
 
         mCurTransitionalCircle1.centerX =

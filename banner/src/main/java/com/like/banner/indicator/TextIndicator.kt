@@ -9,7 +9,6 @@ import android.view.Gravity
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.appcompat.widget.AppCompatTextView
-import com.like.banner.utils.DimensionUtils
 
 /**
  * 文本指示器
@@ -28,9 +27,8 @@ class TextIndicator(
         gravity = Gravity.CENTER
     }
 
-    override fun init(height: Float) {
+    override fun init(indicatorHeight: Int) {
         if (mDataCount <= 1) return
-        val indicatorHeight = DimensionUtils.dp2px(mContext, height)
         // 设置CircleTextView的宽高
         mCircleTextView.layoutParams = ViewGroup.LayoutParams(indicatorHeight, indicatorHeight)
 

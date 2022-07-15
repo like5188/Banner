@@ -10,32 +10,28 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
-import com.like.banner.utils.DimensionUtils
 
 /**
  * 粘性圆角矩形指示器
  *
  * @param mContext
- * @param mDataCount        指示器的数量
- * @param mContainer        指示器的容器
- * @param indicatorWidth    指示器宽度，单位 dp
- * @param indicatorPadding  指示器之间的间隔，单位 dp
- * @param mNormalColor      正常状态的指示器颜色
- * @param mSelectedColors   选中状态的指示器颜色，至少一个，少于[mDataCount]时，循环使用。
+ * @param mDataCount            指示器的数量
+ * @param mContainer            指示器的容器
+ * @param mIndicatorWidth       指示器宽度
+ * @param mIndicatorPadding     指示器之间的间隔
+ * @param mNormalColor          正常状态的指示器颜色
+ * @param mSelectedColors       选中状态的指示器颜色，至少一个，少于[mDataCount]时，循环使用。
  */
 @SuppressLint("ViewConstructor")
 class StickyRoundRectIndicator(
     private val mContext: Context,
     private val mDataCount: Int,
     private val mContainer: ViewGroup,
-    indicatorWidth: Float,
-    indicatorPadding: Float,
+    private val mIndicatorWidth: Int,
+    private val mIndicatorPadding: Int,
     private val mNormalColor: Int,
     private val mSelectedColors: List<Int>
 ) : View(mContext), IBannerIndicator {
-    private val mIndicatorWidthPx: Int = DimensionUtils.dp2px(mContext, indicatorWidth)// 指示器的宽度
-    private val mIndicatorPaddingPx: Int = DimensionUtils.dp2px(mContext, indicatorPadding)// 指示器之间的间隔
-
     private val mPositions = mutableListOf<RectF>()// 占位矩形
 
     private var mTransitionalColor = 0// 画过渡阶段矩形的颜色
@@ -50,15 +46,14 @@ class StickyRoundRectIndicator(
     private val mArgbEvaluator = ArgbEvaluator()
 
     init {
-        require(mIndicatorPaddingPx > 0) { "indicatorPadding 必须大于0" }
+        require(mIndicatorPadding > 0) { "indicatorPadding 必须大于0" }
         require(mSelectedColors.isNotEmpty()) { "mSelectedColors 不能为空" }
     }
 
-    override fun init(height: Float) {
+    override fun init(indicatorHeight: Int) {
         if (mDataCount <= 1) return
-        val indicatorHeight = DimensionUtils.dp2px(mContext, height)
         // 设置本控制器的宽高
-        val w = mIndicatorWidthPx * mDataCount + mIndicatorPaddingPx * mDataCount// 左右各留 mIndicatorPaddingPx/2 的位置，用于显示过渡动画
+        val w = mIndicatorWidth * mDataCount + mIndicatorPadding * mDataCount// 左右各留 mIndicatorPaddingPx/2 的位置，用于显示过渡动画
         this@StickyRoundRectIndicator.layoutParams = ViewGroup.LayoutParams(w, indicatorHeight)
 
         // 确定不随滚动而改变的
@@ -68,15 +63,15 @@ class StickyRoundRectIndicator(
         mTransitionalRect2.bottom = indicatorHeight.toFloat()
 
         // 计算所有占位矩形
-        var startLeft = left + mIndicatorPaddingPx / 2f
+        var startLeft = left + mIndicatorPadding / 2f
         for (i in 0 until mDataCount) {
             val rect = RectF()
             rect.left = startLeft
             rect.top = 0f
-            rect.right = startLeft + mIndicatorWidthPx
+            rect.right = startLeft + mIndicatorWidth
             rect.bottom = indicatorHeight.toFloat()
             mPositions.add(rect)
-            startLeft = rect.right + mIndicatorPaddingPx
+            startLeft = rect.right + mIndicatorPadding
         }
 
         mContainer.removeAllViews()
@@ -124,7 +119,7 @@ class StickyRoundRectIndicator(
         mTransitionalColor = mArgbEvaluator.evaluate(positionOffset, currentColor, nextColor).toString().toInt()
 
         // 计算过渡矩形，它们的left和right都是不断变化的。
-        val distance = mIndicatorWidthPx + mIndicatorPaddingPx// 两矩形中心之间的距离
+        val distance = mIndicatorWidth + mIndicatorPadding// 两矩形中心之间的距离
         val currentRect = mPositions[position]
         mTransitionalRect1.left = currentRect.left + distance * mStartInterpolator.getInterpolation(positionOffset)
         mTransitionalRect1.right = currentRect.right + distance * mEndInterpolator.getInterpolation(positionOffset)

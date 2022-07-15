@@ -10,9 +10,9 @@ interface IBannerIndicator : ViewPager.OnPageChangeListener {
     /**
      * 初始化指示器
      *
-     * @param height    指示器的高度。dp
+     * @param indicatorHeight   单个指示器的高度
      */
-    fun init(height: Float)
+    fun init(indicatorHeight: Int)
 
     override fun onPageSelected(position: Int) {
     }
