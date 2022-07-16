@@ -30,7 +30,7 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
     companion object {
         private const val DEFAULT_HEIGHT_WIDTH_RATIO = 0f
         private const val DEFAULT_CIRCLE_INTERVAL = 3000
-        const val MAX_COUNT = 1000// 注意：设置太大了会在 setCurrentItem 造成 ANR
+        const val MAX_COUNT = 10000// 注意：设置太大了会在 setCurrentItem 造成 ANR
     }
 
     private var mHeightWidthRatio = DEFAULT_HEIGHT_WIDTH_RATIO
