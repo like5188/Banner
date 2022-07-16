@@ -27,7 +27,6 @@ class ImageIndicator(
     private var mPreSelectedPosition = 0
 
     init {
-        require(mDataCount > 0) { "mDataCount 必须大于0" }
         require(mIndicatorPadding > 0) { "mIndicatorPadding 必须大于0" }
         require(mNormalIndicatorResIds.isNotEmpty()) { "mNormalIndicatorResIds 不能为空" }
         mNormalIndicatorResIds.forEach {
@@ -42,6 +41,7 @@ class ImageIndicator(
 
     private fun init() {
         mContainer.removeAllViews()
+        if (mDataCount <= 0) return
         for (i in 0 until mDataCount) {
             // 加载指示器图片
             val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)// 设置指示器宽高

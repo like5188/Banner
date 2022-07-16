@@ -48,7 +48,6 @@ class StickyRoundRectIndicator(
     private val mArgbEvaluator = ArgbEvaluator()
 
     init {
-        require(mDataCount > 0) { "mDataCount 必须大于0" }
         require(mIndicatorWidth > 0) { "mIndicatorWidth 必须大于0" }
         require(mIndicatorHeight > 0) { "mIndicatorHeight 必须大于0" }
         require(mIndicatorPadding > 0) { "mIndicatorPadding 必须大于0" }
@@ -57,6 +56,8 @@ class StickyRoundRectIndicator(
     }
 
     private fun init() {
+        mContainer.removeAllViews()
+        if (mDataCount <= 0) return
         // 设置本控制器的宽高
         val w = mIndicatorWidth * mDataCount + mIndicatorPadding * mDataCount// 左右各留 mIndicatorPaddingPx/2 的位置，用于显示过渡动画
         this.layoutParams = ViewGroup.LayoutParams(w, mIndicatorHeight)
@@ -78,9 +79,7 @@ class StickyRoundRectIndicator(
             mPositions.add(rect)
             startLeft = rect.right + mIndicatorPadding
         }
-
-        mContainer.removeAllViews()
-        mContainer.addView(this@StickyRoundRectIndicator)
+        mContainer.addView(this)
     }
 
     override fun onDraw(canvas: Canvas) {

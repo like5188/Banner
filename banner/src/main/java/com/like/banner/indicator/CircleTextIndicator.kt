@@ -31,17 +31,16 @@ class CircleTextIndicator(
     }
 
     init {
-        require(mDataCount > 0) { "mDataCount 必须大于0" }
         require(mIndicatorHeight > 0) { "mIndicatorHeight 必须大于0" }
         init()
     }
 
     private fun init() {
+        mContainer.removeAllViews()
+        if (mDataCount <= 0) return
         // 设置CircleTextView的宽高
         mCircleTextView.layoutParams = ViewGroup.LayoutParams(mIndicatorHeight, mIndicatorHeight)
         mCircleTextView.text = "1/$mDataCount"
-
-        mContainer.removeAllViews()
         mContainer.addView(mCircleTextView)
     }
 

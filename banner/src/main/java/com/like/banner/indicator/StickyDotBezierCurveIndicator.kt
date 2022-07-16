@@ -52,7 +52,6 @@ class StickyDotBezierCurveIndicator(
     private val mArgbEvaluator = ArgbEvaluator()
 
     init {
-        require(mDataCount > 0) { "mDataCount 必须大于0" }
         require(mIndicatorHeight > 0) { "mIndicatorHeight 必须大于0" }
         require(mIndicatorPadding > 0) { "mIndicatorPadding 必须大于0" }
         require(mSelectedColors.isNotEmpty()) { "mSelectedColors 不能为空" }
@@ -60,6 +59,8 @@ class StickyDotBezierCurveIndicator(
     }
 
     private fun init() {
+        mContainer.removeAllViews()
+        if (mDataCount <= 0) return
         // 计算最大最小圆点半径
         mMaxCircleRadius = mIndicatorHeight / 2f
         mMinCircleRadius = 1f
@@ -83,8 +84,7 @@ class StickyDotBezierCurveIndicator(
             mPositions.add(circle)
             startCenterX += mIndicatorPadding + mMaxCircleRadius * 2f
         }
-        mContainer.removeAllViews()
-        mContainer.addView(this@StickyDotBezierCurveIndicator)
+        mContainer.addView(this)
     }
 
     override fun onDraw(canvas: Canvas) {
