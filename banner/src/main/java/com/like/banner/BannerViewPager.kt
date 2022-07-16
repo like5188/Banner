@@ -35,7 +35,7 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
     private var mHeightWidthRatio = DEFAULT_HEIGHT_WIDTH_RATIO
 
     /**
-     * 循环的时间间隔，毫秒。如果<=0，表示不循环播放。默认3000L
+     * 循环的时间间隔，毫秒。默认3000
      */
     private var mCycleInterval: Int = DEFAULT_CIRCLE_INTERVAL
 
@@ -189,7 +189,6 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
 
     /**
      * 开始轮播
-     * 如果不需要循环轮播，则不要调此方法
      */
     fun play() {
         mStarted = true
