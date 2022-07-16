@@ -40,7 +40,7 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
     private var mCycleInterval: Int = DEFAULT_CIRCLE_INTERVAL
 
     /**
-     * 是否自动开始播放，如果是，则不用再调用[play]
+     * 是否自动开始播放。true：自动播放，不用再调用[play]方法；false：不自动播放，需要手动调用[play]方法进行播放；
      */
     private var mAutoStart = false
 
