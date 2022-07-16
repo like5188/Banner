@@ -72,7 +72,7 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
      * [com.like.banner.indicator.ImageIndicator]、
      * [com.like.banner.indicator.StickyDotBezierCurveIndicator]、
      * [com.like.banner.indicator.StickyRoundRectIndicator]、
-     * [com.like.banner.indicator.TextIndicator]
+     * [com.like.banner.indicator.CircleTextIndicator]
      */
     fun setBannerIndicator(bannerIndicator: IBannerIndicator) {
         mBannerIndicator = bannerIndicator

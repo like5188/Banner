@@ -12,7 +12,7 @@ import androidx.annotation.ColorInt
 import androidx.appcompat.widget.AppCompatTextView
 
 /**
- * 文本指示器
+ * 圆形文本指示器
  * 一个圆形的 TextView，显示内容为 1/3
  *
  * @param mContext
@@ -20,7 +20,7 @@ import androidx.appcompat.widget.AppCompatTextView
  * @param mContainer        指示器的容器
  * @param mIndicatorHeight  指示器的高度
  */
-class TextIndicator(
+class CircleTextIndicator(
     private val mContext: Context,
     private val mDataCount: Int,
     private val mContainer: ViewGroup,

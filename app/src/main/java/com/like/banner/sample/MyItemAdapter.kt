@@ -60,8 +60,8 @@ class MyItemAdapter : BaseListAdapter<ViewDataBinding, IRecyclerViewItem>(
 
     private inline fun <reified T : IBannerIndicator> createBannerIndicator(context: Context, mDataCount: Int, mContainer: ViewGroup): T =
         when (T::class.java) {
-            TextIndicator::class.java -> {
-                TextIndicator(context, mDataCount, mContainer, 24.dp).apply {
+            CircleTextIndicator::class.java -> {
+                CircleTextIndicator(context, mDataCount, mContainer, 24.dp).apply {
                     setTextSize(12f)
                     setTextColor(Color.WHITE)
                     setBackgroundColor(Color.GRAY)
