@@ -65,7 +65,7 @@ class StickyDotBezierCurveIndicator(
         mMinCircleRadius = 1f
         // 设置本控制器的宽高
         val w = (mMaxCircleRadius * 2 * mDataCount + mIndicatorPadding * mDataCount).toInt()// 左右各留 mIndicatorPaddingPx/2 的位置，用于显示过渡动画
-        this@StickyDotBezierCurveIndicator.layoutParams = ViewGroup.LayoutParams(w, mIndicatorHeight)
+        this.layoutParams = ViewGroup.LayoutParams(w, mIndicatorHeight)
 
         // 确定不随滚动而改变的
         mCurTransitionalCircle1.centerY = mMaxCircleRadius

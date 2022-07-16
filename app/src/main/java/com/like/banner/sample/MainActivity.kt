@@ -98,9 +98,8 @@ class MainActivity : AppCompatActivity() {
                         bannerList.size,
                         mBinding.viewBanner.indicatorContainer,
                         10.dp,
-                        10.dp,
-                        listOf(R.drawable.store_point2),
-                        listOf(R.drawable.store_point1)
+                        listOf(R.drawable.dot_unselected),
+                        listOf(R.drawable.dot_selected)
                     )
                     mBinding.viewBanner.vp.setBannerIndicator(indicator)
                     mBinding.viewBanner.vp.adapter = MyBannerPagerAdapter(this, bannerList)

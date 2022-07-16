@@ -81,7 +81,7 @@ class MyItemAdapter : BaseListAdapter<ViewDataBinding, IRecyclerViewItem>(
             }
             ImageIndicator::class.java -> {
                 ImageIndicator(
-                    context, mDataCount, mContainer, 10.dp, 10.dp,
+                    context, mDataCount, mContainer, 10.dp,
                     listOf(R.drawable.store_point2), listOf(R.drawable.store_point1)
                 )
             }
