@@ -132,6 +132,7 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
         // 会发现由于没有缓存，导致每次都要初始化下一页，从而使得下一页的页面每次都是初始状态，不能达到setPageTransformer()的效果。
         // 如果有缓存的话，那么setPageTransformer()的动画效果就会作用于缓存的页面，从而正确显示效果。
         offscreenPageLimit = 2
+        this.addOnPageChangeListener(mOnPageChangeListener)
     }
 
     override fun setAdapter(adapter: PagerAdapter?) {
@@ -140,14 +141,13 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
         super.setAdapter(adapter)
         stop()
         mRealCount = adapter.getRealCount()
-        removeOnPageChangeListener(mOnPageChangeListener)
         when {
             mRealCount == 1 -> { // 如果只有一个页面，就限制 ViewPager 不能手动滑动
                 mScrollable = false// 如果不设置，那么即使viewpager在只有一个页面时不能滑动，但是还是会触发onPageScrolled、onPageScrollStateChanged方法
+                setCurrentItem(0, false)
             }
             mRealCount > 1 -> {
                 mScrollable = true
-                addOnPageChangeListener(mOnPageChangeListener)
                 if (!adapter.isSameData(oldData)) {
                     // 取余处理，避免默认值不能被 mDataCount 整除，从而不能让初始时在第0个位置。
                     mCurPosition = if (mAutoLoop) {
