@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.like.banner.indicator.ImageIndicator
 import com.like.banner.sample.databinding.ActivityMainBinding
 import com.like.common.util.Logger
+import com.like.common.util.dp
 import com.like.recyclerview.adapter.CombineAdapter
 import com.like.recyclerview.layoutmanager.WrapLinearLayoutManager
 import com.like.recyclerview.model.IRecyclerViewItem
@@ -50,11 +52,34 @@ class MainActivity : AppCompatActivity() {
         mBinding.swipeRefreshLayout.setOnRefreshListener {
             lifecycleScope.launch {
                 mAdapter.refresh()
+                getBannerData()
             }
         }
 
         lifecycleScope.launchWhenResumed {
             mAdapter.initial()
+            getBannerData()
+        }
+    }
+
+    private suspend fun getBannerData() {
+        val bannerInfo = mViewModel.getBannerData()
+        val data = bannerInfo?.bannerList
+        if (!data.isNullOrEmpty()) {
+            mBinding.viewBanner.vp.stop()
+            mBinding.viewBanner.vp.setScrollSpeed()
+            mBinding.viewBanner.vp.adapter = MyBannerPagerAdapter(this, data)
+
+            val indicator = ImageIndicator(
+                this,
+                data.size,
+                mBinding.viewBanner.indicatorContainer,
+                10.dp,
+                10.dp,
+                listOf(R.drawable.store_point2),
+                listOf(R.drawable.store_point1)
+            )
+            mBinding.viewBanner.vp.setBannerIndicator(indicator)
         }
     }
 

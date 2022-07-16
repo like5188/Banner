@@ -54,7 +54,7 @@ class MyItemAdapter : BaseListAdapter<ViewDataBinding, IRecyclerViewItem>(
 
             val indicator: ImageIndicator = createBannerIndicator(context, item.bannerList.size, binding.indicatorContainer)
             binding.vp.setBannerIndicator(indicator)
-            binding.vp.play()// 如果不需要自动轮播，则不调用此方法即可
+//            binding.vp.play()// 如果不需要自动轮播，则不调用此方法即可
         }
     }
 
