@@ -30,6 +30,7 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
     companion object {
         private const val DEFAULT_HEIGHT_WIDTH_RATIO = 0f
         private const val DEFAULT_CIRCLE_INTERVAL = 3000
+        const val MAX_COUNT = 1000// 注意：设置太大了会在 setCurrentItem 造成 ANR
     }
 
     private var mHeightWidthRatio = DEFAULT_HEIGHT_WIDTH_RATIO
@@ -146,7 +147,7 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
                 addOnPageChangeListener(mOnPageChangeListener)
                 if (!adapter.isSameData(oldData)) {// 如果不是相同的数据，证明是刷新操作，而不是RecyclerView的复用操作。
                     // 取余处理，避免默认值不能被 mDataCount 整除，从而不能让初始时在第0个位置。
-                    mCurPosition = Int.MAX_VALUE / 2 - (Int.MAX_VALUE / 2) % mRealCount
+                    mCurPosition = MAX_COUNT / 2 - (MAX_COUNT / 2) % mRealCount
                 }
                 play()
             }
