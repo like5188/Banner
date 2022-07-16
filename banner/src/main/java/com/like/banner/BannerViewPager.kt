@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AccelerateInterpolator
@@ -133,9 +132,7 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
         require(adapter is BannerPagerAdapter) { "adapter of viewPager must be com.like.banner.BannerPagerAdapter" }
         val oldData = (getAdapter() as? BannerPagerAdapter)?.getData()
         super.setAdapter(adapter)
-        Log.e("TAG", "1")
         stop()
-        Log.e("TAG", "2")
         mRealCount = adapter.getRealCount()
         removeOnPageChangeListener(mOnPageChangeListener)
         when {
@@ -152,7 +149,6 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
                 play()
             }
         }
-        Log.e("TAG", "3")
     }
 
     // 注意：如果不是在 RecyclerView 中使用的话，那么调用此方法的时候还没有 setAdapter，那么就不会触发自动轮播，因为 mScrollable 为 false
