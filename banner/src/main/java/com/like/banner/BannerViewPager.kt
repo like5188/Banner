@@ -148,7 +148,7 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
                     // 取余处理，避免默认值不能被 mDataCount 整除，从而不能让初始时在第0个位置。
                     mCurPosition = Int.MAX_VALUE / 2 - (Int.MAX_VALUE / 2) % mRealCount
                 }
-//                play()
+                play()
             }
         }
         Log.e("TAG", "3")
