@@ -15,7 +15,6 @@ import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.like.banner.indicator.IBannerIndicator
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.logging.Logger
 
 /**
  * 无限滚动轮播图[BannerViewPager]，必须配合[BannerPagerAdapter]使用。
@@ -57,8 +56,7 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
 
     private val mScrollRunnable: Runnable = object : Runnable {
         override fun run() {
-            mCurPosition++
-            setCurrentItem(mCurPosition, true)
+            setCurrentItem(++mCurPosition, true)
             postDelayed(this, mCycleInterval.toLong())
         }
     }
