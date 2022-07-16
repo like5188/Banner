@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AccelerateInterpolator
@@ -13,6 +14,8 @@ import android.widget.Scroller
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.like.banner.indicator.IBannerIndicator
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.logging.Logger
 
 /**
  * 无限滚动轮播图[BannerViewPager]，必须配合[BannerPagerAdapter]使用。
@@ -20,35 +23,21 @@ import com.like.banner.indicator.IBannerIndicator
  *
  * 自定义的属性包括：
  * @attr ref android.R.styleable#BannerViewPager_height_width_ratio [mHeightWidthRatio]
+ * 高宽比例，默认为0f，表示自己设置宽高，不按比例进行设置。只有大于0时才会按比例设置宽高。
  * @attr ref android.R.styleable#BannerViewPager_cycle_interval     [mCycleInterval]
- * @attr ref android.R.styleable#BannerViewPager_auto_start         [mAutoStart]
+ * 循环的时间间隔，毫秒。默认3000，如果小于等于0，也会设置为默认值3000
  */
 open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.viewpager.widget.ViewPager(context, attrs) {
     companion object {
-        private const val DEFAULT_HEIGHT_WIDTH_RATIO = 0.4f
+        private const val DEFAULT_HEIGHT_WIDTH_RATIO = 0f
         private const val DEFAULT_CIRCLE_INTERVAL = 3000
     }
 
-    /**
-     * 高宽比例，默认为0.4f
-     */
     private var mHeightWidthRatio = DEFAULT_HEIGHT_WIDTH_RATIO
-
-    /**
-     * 循环的时间间隔，毫秒。默认3000
-     */
     private var mCycleInterval: Int = DEFAULT_CIRCLE_INTERVAL
-
-    /**
-     * 是否自动开始播放。true：自动播放，不用再调用[play]方法；false：不自动播放，需要手动调用[play]方法进行播放；
-     */
-    private var mAutoStart = false
-
-    private var mRunning = false// 是否正在轮播
-    private var mStarted = false// 是否已经开始轮播
+    private var mRunning = AtomicBoolean(false)// 是否正在轮播
     private var mVisible = false// ViewPager是否可见
     private var mUserPresent = true// 手机屏幕对用户是否可见
-
     private var mScrollable = false// 是否可以滚动
 
     /**
@@ -68,11 +57,9 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
 
     private val mScrollRunnable: Runnable = object : Runnable {
         override fun run() {
-            if (mRunning) {
-                mCurPosition++
-                setCurrentItem(mCurPosition, true)
-                postDelayed(this, mCycleInterval.toLong())
-            }
+            mCurPosition++
+            setCurrentItem(mCurPosition, true)
+            postDelayed(this, mCycleInterval.toLong())
         }
     }
 
@@ -93,10 +80,10 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
             val action = intent.action
             if (Intent.ACTION_SCREEN_OFF == action) {
                 mUserPresent = false
-                updateRunning()
+                stop()
             } else if (Intent.ACTION_USER_PRESENT == action) {
                 mUserPresent = true
-                updateRunning()
+                play()
             }
         }
     }
@@ -133,7 +120,9 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
         val a = context.obtainStyledAttributes(attrs, R.styleable.BannerViewPager)
         mHeightWidthRatio = a.getFloat(R.styleable.BannerViewPager_height_width_ratio, DEFAULT_HEIGHT_WIDTH_RATIO)
         mCycleInterval = a.getInt(R.styleable.BannerViewPager_cycle_interval, DEFAULT_CIRCLE_INTERVAL)
-        mAutoStart = a.getBoolean(R.styleable.BannerViewPager_auto_start, false)
+        if (mCycleInterval <= 0) {
+            mCycleInterval = DEFAULT_CIRCLE_INTERVAL
+        }
         a.recycle()
         // 必须设置这个，否则在使用setPageTransformer()并配合android:clipChildren="false"来使用时，
         // 会发现由于没有缓存，导致每次都要初始化下一页，从而使得下一页的页面每次都是初始状态，不能达到setPageTransformer()的效果。
@@ -142,9 +131,12 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
     }
 
     override fun setAdapter(adapter: PagerAdapter?) {
+        require(adapter is BannerPagerAdapter) { "adapter of viewPager must be com.like.banner.BannerPagerAdapter" }
         val oldData = (getAdapter() as? BannerPagerAdapter)?.getData()
         super.setAdapter(adapter)
-        require(adapter is BannerPagerAdapter) { "adapter of viewPager must be com.like.banner.BannerPagerAdapter" }
+        Log.e("TAG", "1")
+        stop()
+        Log.e("TAG", "2")
         mRealCount = adapter.getRealCount()
         removeOnPageChangeListener(mOnPageChangeListener)
         when {
@@ -158,10 +150,13 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
                     // 取余处理，避免默认值不能被 mDataCount 整除，从而不能让初始时在第0个位置。
                     mCurPosition = Int.MAX_VALUE / 2 - (Int.MAX_VALUE / 2) % mRealCount
                 }
+//                play()
             }
         }
+        Log.e("TAG", "3")
     }
 
+    // 注意：如果不是在 RecyclerView 中使用的话，那么调用此方法的时候还没有 setAdapter，那么就不会触发自动轮播，因为 mScrollable 为 false
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         // Listen for broadcasts related to user-presence
@@ -169,49 +164,41 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
         filter.addAction(Intent.ACTION_SCREEN_OFF)
         filter.addAction(Intent.ACTION_USER_PRESENT)
         context.registerReceiver(mReceiver, filter, null, handler)
-        if (mAutoStart) { // Automatically start when requested
-            play()
-        }
+        play()
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         mVisible = false
         context.unregisterReceiver(mReceiver)
-        updateRunning()
+        stop()
     }
 
     override fun onWindowVisibilityChanged(visibility: Int) {
         super.onWindowVisibilityChanged(visibility)
         mVisible = visibility == View.VISIBLE
-        updateRunning()
+        if (mVisible) {
+            play()
+        }
     }
 
     /**
      * 开始轮播
      */
     fun play() {
-        mStarted = true
-        updateRunning()
-    }
-
-    fun stop() {
-        mStarted = false
-        updateRunning()
-    }
-
-    private fun updateRunning() {
-        val running = mVisible && mStarted && mUserPresent && mScrollable
-        if (running != mRunning) {
-            if (running) {
+        if (mVisible && mUserPresent && mScrollable) {
+            if (mRunning.compareAndSet(false, true)) {
                 // 因为页面变化，所以setCurrentItem方法能触发onPageSelected、onPageScrolled方法，
                 // 但是不能触发 onPageScrollStateChanged，所以不会启动自动播放，由使用者手动开启自动播放
                 currentItem = mCurPosition
                 postDelayed(mScrollRunnable, mCycleInterval.toLong())
-            } else {
-                removeCallbacks(mScrollRunnable)
             }
-            mRunning = running
+        }
+    }
+
+    fun stop() {
+        if (mRunning.compareAndSet(true, false)) {
+            removeCallbacks(mScrollRunnable)
         }
     }
 
