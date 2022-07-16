@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initSingleBannerView()
+        initList()
     }
 
     private fun initSingleBannerView() {
