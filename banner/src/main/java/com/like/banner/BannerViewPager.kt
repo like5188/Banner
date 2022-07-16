@@ -12,6 +12,7 @@ import android.view.animation.Interpolator
 import android.widget.Scroller
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
+import com.like.banner.BannerViewPager.Companion.mAutoLoop
 import com.like.banner.indicator.IBannerIndicator
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -24,12 +25,16 @@ import java.util.concurrent.atomic.AtomicBoolean
  * 高宽比例，默认为0f，表示自己设置宽高，不按比例进行设置。只有大于0时才会按比例设置宽高。
  * @attr ref android.R.styleable#BannerViewPager_cycle_interval     [mCycleInterval]
  * 循环的时间间隔，毫秒。默认3000，如果小于等于0，也会设置为默认值3000
+ * @attr ref android.R.styleable#BannerViewPager_auto_loop          [mAutoLoop]
+ * 是否开启自动无限轮播
  */
 open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.viewpager.widget.ViewPager(context, attrs) {
     companion object {
         private const val DEFAULT_HEIGHT_WIDTH_RATIO = 0f
         private const val DEFAULT_CIRCLE_INTERVAL = 3000
-        const val MAX_COUNT = 10000// 注意：设置太大了会在 setCurrentItem 造成 ANR，但是不知道为什么，在 RecyclerView 中使用时又不会卡。
+        private const val DEFAULT_AUTO_LOOP = true
+        internal const val MAX_COUNT = 10000// 注意：设置太大了会在 setCurrentItem 造成 ANR，但是不知道为什么，在 RecyclerView 中使用时又不会卡。
+        internal var mAutoLoop: Boolean = DEFAULT_AUTO_LOOP
     }
 
     private var mHeightWidthRatio = DEFAULT_HEIGHT_WIDTH_RATIO
@@ -118,6 +123,7 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
         val a = context.obtainStyledAttributes(attrs, R.styleable.BannerViewPager)
         mHeightWidthRatio = a.getFloat(R.styleable.BannerViewPager_height_width_ratio, DEFAULT_HEIGHT_WIDTH_RATIO)
         mCycleInterval = a.getInt(R.styleable.BannerViewPager_cycle_interval, DEFAULT_CIRCLE_INTERVAL)
+        mAutoLoop = a.getBoolean(R.styleable.BannerViewPager_auto_loop, DEFAULT_AUTO_LOOP)
         if (mCycleInterval <= 0) {
             mCycleInterval = DEFAULT_CIRCLE_INTERVAL
         }
@@ -142,10 +148,15 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
             mRealCount > 1 -> {
                 mScrollable = true
                 addOnPageChangeListener(mOnPageChangeListener)
-                if (!adapter.isSameData(oldData)) {// 如果不是相同的数据，证明是刷新操作，而不是RecyclerView的复用操作。
+                if (!adapter.isSameData(oldData)) {
                     // 取余处理，避免默认值不能被 mDataCount 整除，从而不能让初始时在第0个位置。
-                    mCurPosition = MAX_COUNT / 2 - (MAX_COUNT / 2) % mRealCount
+                    mCurPosition = if (mAutoLoop) {
+                        MAX_COUNT / 2 - (MAX_COUNT / 2) % mRealCount
+                    } else {
+                        0
+                    }
                 }
+                setCurrentItem(mCurPosition, false)
                 play()
             }
         }
@@ -181,11 +192,10 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
      * 开始轮播
      */
     fun play() {
-        if (mVisible && mUserPresent && mScrollable) {
+        if (mVisible && mUserPresent && mScrollable && mAutoLoop) {
             if (mRunning.compareAndSet(false, true)) {
                 // 因为页面变化，所以setCurrentItem方法能触发onPageSelected、onPageScrolled方法，
                 // 但是不能触发 onPageScrollStateChanged，所以不会启动自动播放，由使用者手动开启自动播放
-                currentItem = mCurPosition
                 postDelayed(mScrollRunnable, mCycleInterval.toLong())
             }
         }

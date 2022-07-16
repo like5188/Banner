@@ -20,7 +20,7 @@ abstract class BannerPagerAdapter(private val mList: List<*>) : androidx.viewpag
 
     internal fun getData() = mList
 
-    final override fun getCount(): Int = BannerViewPager.MAX_COUNT
+    final override fun getCount(): Int = if (BannerViewPager.mAutoLoop) BannerViewPager.MAX_COUNT else mList.size
 
     final override fun isViewFromObject(p0: View, p1: Any): Boolean = p0 == p1
 
