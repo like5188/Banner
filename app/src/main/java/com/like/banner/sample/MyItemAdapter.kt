@@ -48,13 +48,12 @@ class MyItemAdapter : BaseListAdapter<ViewDataBinding, IRecyclerViewItem>(
         val context = holder.itemView.context
         if (item.bannerList.isNotEmpty()) {
             binding.vp.setScrollSpeed()
-            binding.vp.adapter = MyBannerPagerAdapter(context, item.bannerList)
             binding.vp.pageMargin = 10.dp
             binding.vp.setPageTransformer(true, CascadingPageTransformer())
-
             val indicator: ImageIndicator = createBannerIndicator(context, item.bannerList.size, binding.indicatorContainer)
             binding.vp.setBannerIndicator(indicator)
-//            binding.vp.play()// 如果不需要自动轮播，则不调用此方法即可
+            // 注意：设置 adapter 必须放在设置 indicator 的后面，否则刷新时会造成位置显示错乱。
+            binding.vp.adapter = MyBannerPagerAdapter(context, item.bannerList)
         }
     }
 

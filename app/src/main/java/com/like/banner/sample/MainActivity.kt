@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initSingleBannerView()
+        initList()
     }
 
     private fun initSingleBannerView() {
@@ -102,6 +102,7 @@ class MainActivity : AppCompatActivity() {
                         listOf(R.drawable.dot_selected)
                     )
                     mBinding.viewBanner.vp.setBannerIndicator(indicator)
+                    // 注意：设置 adapter 必须放在设置 indicator 的后面，否则刷新时会造成位置显示错乱。
                     mBinding.viewBanner.vp.adapter = MyBannerPagerAdapter(this, bannerList)
                 }
             }
