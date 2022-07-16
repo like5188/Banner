@@ -93,8 +93,6 @@ class MainActivity : AppCompatActivity() {
             .collect {
                 val bannerList = it?.bannerList
                 if (!bannerList.isNullOrEmpty()) {
-                    mBinding.viewBanner.vp.adapter = MyBannerPagerAdapter(this, bannerList)
-
                     val indicator = ImageIndicator(
                         this,
                         bannerList.size,
@@ -105,6 +103,7 @@ class MainActivity : AppCompatActivity() {
                         listOf(R.drawable.store_point1)
                     )
                     mBinding.viewBanner.vp.setBannerIndicator(indicator)
+                    mBinding.viewBanner.vp.adapter = MyBannerPagerAdapter(this, bannerList)
                 }
             }
     }
