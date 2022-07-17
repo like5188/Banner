@@ -135,7 +135,10 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
         this.addOnPageChangeListener(mOnPageChangeListener)
     }
 
-    override fun setAdapter(adapter: PagerAdapter?) {
+    /**
+     * 注意：此方法必须放在最后调用，否则刷新时会造成 Indicator 位置显示错乱。
+     */
+    final override fun setAdapter(adapter: PagerAdapter?) {
         require(adapter is BannerPagerAdapter) { "adapter of viewPager must be com.like.banner.BannerPagerAdapter" }
         val oldData = (getAdapter() as? BannerPagerAdapter)?.getData()
         super.setAdapter(adapter)
@@ -163,7 +166,7 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
     }
 
     // 注意：如果不是在 RecyclerView 中使用的话，那么调用此方法的时候还没有 setAdapter，那么就不会触发自动轮播，因为 mScrollable 为 false
-    override fun onAttachedToWindow() {
+    final override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         // Listen for broadcasts related to user-presence
         val filter = IntentFilter()
@@ -173,14 +176,14 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
         play()
     }
 
-    override fun onDetachedFromWindow() {
+    final override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         mVisible = false
         context.unregisterReceiver(mReceiver)
         stop()
     }
 
-    override fun onWindowVisibilityChanged(visibility: Int) {
+    final override fun onWindowVisibilityChanged(visibility: Int) {
         super.onWindowVisibilityChanged(visibility)
         mVisible = visibility == View.VISIBLE
         if (mVisible) {
@@ -191,7 +194,7 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
     /**
      * 开始轮播
      */
-    fun play() {
+    private fun play() {
         if (mVisible && mUserPresent && mScrollable && mAutoLoop) {
             if (mRunning.compareAndSet(false, true)) {
                 // 因为页面变化，所以setCurrentItem方法能触发onPageSelected、onPageScrolled方法，
@@ -201,13 +204,13 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
         }
     }
 
-    fun stop() {
+    private fun stop() {
         if (mRunning.compareAndSet(true, false)) {
             removeCallbacks(mScrollRunnable)
         }
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    final override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         var hms = heightMeasureSpec
         if (mHeightWidthRatio > 0f) {
             val widthMode = MeasureSpec.getMode(widthMeasureSpec)
@@ -220,11 +223,11 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
         super.onMeasure(widthMeasureSpec, hms)
     }
 
-    override fun onTouchEvent(ev: MotionEvent): Boolean {
+    final override fun onTouchEvent(ev: MotionEvent): Boolean {
         return mScrollable && super.onTouchEvent(ev)
     }
 
-    override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
+    final override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         return mScrollable && super.onInterceptTouchEvent(ev)
     }
 
