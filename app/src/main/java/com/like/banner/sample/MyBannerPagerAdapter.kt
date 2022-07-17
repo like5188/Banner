@@ -13,8 +13,8 @@ class MyBannerPagerAdapter(context: Context, private val list: List<BannerInfo.B
 
     override fun onInstantiateItem(position: Int): View {
         val binding: ItemBannerBinding = DataBindingUtil.inflate(mLayoutInflater, R.layout.item_banner, null, false)
-        val info = list[position]
-        binding.iv.load(info.imagePath)
+        val info = list.getOrNull(position)
+        binding.iv.load(info?.imagePath)
         return binding.root
     }
 

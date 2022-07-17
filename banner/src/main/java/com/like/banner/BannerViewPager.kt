@@ -91,7 +91,7 @@ open class BannerViewPager(context: Context, attrs: AttributeSet?) : androidx.vi
         }
     }
     private val mOnPageChangeListener = object : OnPageChangeListener {
-        fun getRealPosition(position: Int): Int = position % mRealCount
+        fun getRealPosition(position: Int): Int = if (mRealCount == 0) 0 else position % mRealCount
 
         // position当前选择的是哪个页面。注意：如果mCount=1，那么默认会显示第0页，此时不会触发此方法，只会触发onPageScrolled方法。
         override fun onPageSelected(position: Int) {
