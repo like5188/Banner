@@ -147,8 +147,8 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
                 mScrollable = true
                 if (adapter.currentList != oldData) {
                     // 取余处理，避免默认值不能被 mDataCount 整除，从而不能让初始时在第0个位置。
-                    mCurPosition = if (BannerViewPager.mAutoLoop) {
-                        BannerViewPager.MAX_COUNT / 2 - (BannerViewPager.MAX_COUNT / 2) % mRealCount
+                    mCurPosition = if (mAutoLoop) {
+                        MAX_COUNT / 2 - (MAX_COUNT / 2) % mRealCount
                     } else {
                         0
                     }
