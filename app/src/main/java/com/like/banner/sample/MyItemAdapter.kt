@@ -52,7 +52,6 @@ class MyItemAdapter : BaseListAdapter<ViewDataBinding, IRecyclerViewItem>(
         if (binding.banner.needBindViewHolder(item.bannerList, MyBannerAdapter.DIFF)) {
             val context = holder.itemView.context
             binding.banner.setAdapter(MyBannerAdapter())
-            binding.banner.setScrollSpeed()
             CompositePageTransformer().apply {
                 addTransformer(MarginPageTransformer(10.dp))
                 addTransformer(AlphaAndScalePageTransformer())
