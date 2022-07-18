@@ -30,7 +30,9 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
     companion object {
         private const val DEFAULT_CIRCLE_INTERVAL = 3000
         private const val DEFAULT_AUTO_LOOP = true
-        internal const val MAX_COUNT = 10000// 注意：设置太大了会在 setCurrentItem 造成 ANR，但是不知道为什么，在 RecyclerView 中使用时又不会卡。
+
+        // 注意：如果使用 ViewPager 那么这个值设置太大了会在 setCurrentItem 造成 ANR，但是不知道为什么，在 ViewPager2、RecyclerView 中使用时又不会卡。
+        internal const val MAX_COUNT = Int.MAX_VALUE
         internal var mAutoLoop: Boolean = DEFAULT_AUTO_LOOP
     }
 
