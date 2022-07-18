@@ -147,7 +147,7 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
         }
         listAdapter.submitList(newData, commitCallback)
         when {
-            newData.size == 1 -> { // 如果只有一个页面，就限制 ViewPager 不能手动滑动
+            newData.size == 1 -> { // 如果只有一个页面，就限制 ViewPager2 不能手动滑动
                 // 如果不设置，那么即使viewpager在只有一个页面时不能滑动，但是触摸还是会触发onPageScrolled、onPageScrollStateChanged方法
                 mViewPager2.isUserInputEnabled = false
                 mViewPager2.setCurrentItem(0, false)
