@@ -11,7 +11,6 @@ import com.like.common.util.dp
 import com.like.recyclerview.adapter.BaseListAdapter
 import com.like.recyclerview.model.IRecyclerViewItem
 import com.like.recyclerview.viewholder.BindingViewHolder
-import com.ocnyang.pagetransformerhelp.cardtransformer.CascadingPageTransformer
 
 class MyItemAdapter : BaseListAdapter<ViewDataBinding, IRecyclerViewItem>(
     object : DiffUtil.ItemCallback<IRecyclerViewItem>() {
@@ -46,13 +45,15 @@ class MyItemAdapter : BaseListAdapter<ViewDataBinding, IRecyclerViewItem>(
             return
         }
         val context = holder.itemView.context
-        binding.vp.setScrollSpeed()
-        binding.vp.pageMargin = 10.dp
-        binding.vp.setPageTransformer(true, CascadingPageTransformer())
+        binding.banner.setScrollSpeed()
+//        binding.banner.pageMargin = 10.dp
+//        binding.banner.setPageTransformer(true, CascadingPageTransformer())
         val indicator: StickyRoundRectIndicator = createBannerIndicator(context, item.bannerList.size, binding.indicatorContainer)
-        binding.vp.setBannerIndicator(indicator)
+        binding.banner.setBannerIndicator(indicator)
         // 注意：设置 adapter 必须放在设置 indicator 的后面，否则刷新时会造成位置显示错乱。
-        binding.vp.adapter = MyBannerPagerAdapter(context, item.bannerList)
+        binding.banner.setAdapter(MyBannerAdapter().apply {
+            submitList(item.bannerList)
+        })
     }
 
     private inline fun <reified T : IBannerIndicator> createBannerIndicator(context: Context, mDataCount: Int, mContainer: ViewGroup): T =
