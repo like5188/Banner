@@ -45,15 +45,13 @@ class MyItemAdapter : BaseListAdapter<ViewDataBinding, IRecyclerViewItem>(
             return
         }
         val context = holder.itemView.context
+        binding.banner.setAdapter(MyBannerAdapter())
         binding.banner.setScrollSpeed()
 //        binding.banner.pageMargin = 10.dp
 //        binding.banner.setPageTransformer(true, CascadingPageTransformer())
         val indicator: StickyRoundRectIndicator = createBannerIndicator(context, item.bannerList.size, binding.indicatorContainer)
         binding.banner.setBannerIndicator(indicator)
-        // 注意：设置 adapter 必须放在设置 indicator 的后面，否则刷新时会造成位置显示错乱。
-        binding.banner.setAdapter(MyBannerAdapter().apply {
-            submitList(item.bannerList)
-        })
+        binding.banner.submitList(item.bannerList)
     }
 
     private inline fun <reified T : IBannerIndicator> createBannerIndicator(context: Context, mDataCount: Int, mContainer: ViewGroup): T =

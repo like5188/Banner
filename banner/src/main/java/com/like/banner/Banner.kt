@@ -10,6 +10,7 @@ import android.view.animation.AccelerateInterpolator
 import android.view.animation.Interpolator
 import android.widget.FrameLayout
 import android.widget.Scroller
+import androidx.recyclerview.widget.ListAdapter
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import com.like.banner.Banner.Companion.mAutoLoop
@@ -30,9 +31,6 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
     companion object {
         private const val DEFAULT_CIRCLE_INTERVAL = 3000
         private const val DEFAULT_AUTO_LOOP = true
-
-        // 注意：如果使用 ViewPager 那么这个值设置太大了会在 setCurrentItem 造成 ANR，但是不知道为什么，在 ViewPager2、RecyclerView 中使用时又不会卡。
-        internal const val MAX_COUNT = Int.MAX_VALUE
         internal var mAutoLoop: Boolean = DEFAULT_AUTO_LOOP
     }
 
@@ -43,37 +41,15 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
     private var mUserPresent = true// 手机屏幕对用户是否可见
 
     /**
-     * 真实的数据条数
-     */
-    private var mRealCount = 0
-
-    /**
-     * ViewPager的当前位置
-     */
-    private var mCurPosition = -1
-
-    /**
      * 指示器
      */
     private var mBannerIndicator: IBannerIndicator? = null
 
     private val mScrollRunnable: Runnable = object : Runnable {
         override fun run() {
-            mViewPager2.setCurrentItem(++mCurPosition, true)
+            mViewPager2.setCurrentItem(mViewPager2.currentItem + 1, true)
             postDelayed(this, mCycleInterval.toLong())
         }
-    }
-
-    /**
-     * 设置指示器。
-     * 库里默认实现了四种指示器：
-     * [com.like.banner.indicator.ImageIndicator]、
-     * [com.like.banner.indicator.StickyDotBezierCurveIndicator]、
-     * [com.like.banner.indicator.StickyRoundRectIndicator]、
-     * [com.like.banner.indicator.CircleTextIndicator]
-     */
-    fun setBannerIndicator(bannerIndicator: IBannerIndicator) {
-        mBannerIndicator = bannerIndicator
     }
 
     private val mReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -89,22 +65,37 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
         }
     }
     private val mOnPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
-        fun getRealPosition(position: Int): Int = if (mRealCount == 0) 0 else position % mRealCount
+        fun getIndicatorPosition(position: Int): Int {
+            val totalCount = (mViewPager2.adapter as ListAdapter<*, *>).currentList.size
+            return if (totalCount > 1) {
+                when (position) {
+                    0 -> totalCount - 2
+                    totalCount - 1 -> 0
+                    else -> position - 1
+                }
+            } else {
+                position
+            }
+        }
 
         // position当前选择的是哪个页面。注意：如果mCount=1，那么默认会显示第0页，此时不会触发此方法，只会触发onPageScrolled方法。
         override fun onPageSelected(position: Int) {
-            mCurPosition = position
-            mBannerIndicator?.onPageSelected(getRealPosition(position))
+            mBannerIndicator?.onPageSelected(getIndicatorPosition(position))
         }
 
         // position表示目标位置，positionOffset表示偏移的百分比，positionOffsetPixels表示偏移的像素
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-            mBannerIndicator?.onPageScrolled(getRealPosition(position), positionOffset, positionOffsetPixels)
+            mBannerIndicator?.onPageScrolled(getIndicatorPosition(position), positionOffset, positionOffsetPixels)
         }
 
         override fun onPageScrollStateChanged(state: Int) {
             when (state) {
                 ViewPager2.SCROLL_STATE_IDLE -> {// 页面停止在了某页，有可能是手指滑动一页结束，有可能是自动滑动一页结束，开始自动播放。
+                    val totalCount = (mViewPager2.adapter as ListAdapter<*, *>).currentList.size
+                    when (mViewPager2.currentItem) {
+                        totalCount - 1 -> mViewPager2.setCurrentItem(1, false)
+                        0 -> mViewPager2.setCurrentItem(totalCount - 2, false)
+                    }
                     play()
                 }
                 ViewPager2.SCROLL_STATE_DRAGGING -> {// 手指按下开始滑动，停止自动播放。
@@ -140,28 +131,49 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
     /**
      * 注意：此方法必须放在最后调用，否则刷新时会造成 Indicator 位置显示错乱。
      */
-    fun setAdapter(adapter: BannerAdapter<*, *>) {
-        val oldData = (mViewPager2.adapter as? BannerAdapter<*, *>)?.currentList
+    fun setAdapter(adapter: ListAdapter<*, *>) {
         mViewPager2.adapter = adapter
+    }
+
+    /**
+     * 设置指示器。
+     * 库里默认实现了四种指示器：
+     * [com.like.banner.indicator.ImageIndicator]、
+     * [com.like.banner.indicator.StickyDotBezierCurveIndicator]、
+     * [com.like.banner.indicator.StickyRoundRectIndicator]、
+     * [com.like.banner.indicator.CircleTextIndicator]
+     */
+    fun setBannerIndicator(bannerIndicator: IBannerIndicator) {
+        mBannerIndicator = bannerIndicator
+    }
+
+    fun <T> submitList(list: List<T>?, commitCallback: Runnable? = null) {
         stop()
-        mRealCount = adapter.currentList.size
+        val listAdapter = (mViewPager2.adapter as? ListAdapter<T, *>) ?: throw RuntimeException("must call setAdapter first")
+        if (list.isNullOrEmpty()) {
+            listAdapter.submitList(null, commitCallback)
+            return
+        }
+        val newData = mutableListOf<T>()
+        if (list.size > 1) {// 超过1条数据，就在首尾各加一条数据
+            val first = list.last()
+            val last = list.first()
+            newData.add(first)
+            newData.addAll(list)
+            newData.add(last)
+        } else {
+            newData.addAll(list)
+        }
+        listAdapter.submitList(newData, commitCallback)
         when {
-            mRealCount == 1 -> { // 如果只有一个页面，就限制 ViewPager 不能手动滑动
+            newData.size == 1 -> { // 如果只有一个页面，就限制 ViewPager 不能手动滑动
                 // 如果不设置，那么即使viewpager在只有一个页面时不能滑动，但是还是会触发onPageScrolled、onPageScrollStateChanged方法
                 mViewPager2.isUserInputEnabled = false
                 mViewPager2.setCurrentItem(0, false)
             }
-            mRealCount > 1 -> {
+            newData.size > 1 -> {
                 mViewPager2.isUserInputEnabled = true
-                if (adapter.currentList != oldData) {
-                    // 取余处理，避免默认值不能被 mDataCount 整除，从而不能让初始时在第0个位置。
-                    mCurPosition = if (mAutoLoop) {
-                        MAX_COUNT / 2 - (MAX_COUNT / 2) % mRealCount
-                    } else {
-                        0
-                    }
-                }
-                mViewPager2.setCurrentItem(mCurPosition, false)
+                mViewPager2.setCurrentItem(1, false)
                 play()
             }
         }
