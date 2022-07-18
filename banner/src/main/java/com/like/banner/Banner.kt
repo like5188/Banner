@@ -69,7 +69,7 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
             val totalCount = (mViewPager2.adapter as ListAdapter<*, *>).currentList.size
             return if (totalCount > 1) {
                 when (position) {
-                    0 -> totalCount - 2
+                    0 -> totalCount - 3
                     totalCount - 1 -> 0
                     else -> position - 1
                 }
