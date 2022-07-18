@@ -27,7 +27,7 @@ abstract class BannerAdapter<VB : ViewDataBinding, ValueInList>(diffCallback: Di
     }
 
     final override fun onBindViewHolder(holder: BindingViewHolder<VB>, position: Int) {
-        val realPosition = if (currentList.isEmpty()) 0 else position % currentList.size
+        val realPosition = if (currentList.isEmpty()) 0 else holder.adapterPosition % currentList.size
         val item = try {
             getItem(realPosition)
         } catch (e: Exception) {
