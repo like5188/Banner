@@ -126,10 +126,12 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
     }
 
     /**
-     * 注意：此方法必须放在最后调用，否则刷新时会造成 Indicator 位置显示错乱。
+     * 注意：此方法只能设置一次 adapter
      */
     fun setAdapter(adapter: ListAdapter<*, *>) {
-        mViewPager2.adapter = adapter
+        if (mViewPager2.adapter == null) {
+            mViewPager2.adapter = adapter
+        }
     }
 
     fun <T> submitList(list: List<T>?, commitCallback: Runnable? = null) {
@@ -139,6 +141,10 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
             listAdapter.submitList(null, commitCallback)
             return
         }
+
+        val oldPosition = mViewPager2.currentItem
+        val oldData = listAdapter.currentList.toList()
+
         val newData = mutableListOf<T>()
         if (list.size > 1) {// 超过1条数据，就在首尾各加一条数据
             val first = list.last()
@@ -152,13 +158,18 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
         listAdapter.submitList(newData, commitCallback)
         when {
             newData.size == 1 -> { // 如果只有一个页面，就限制 ViewPager 不能手动滑动
-                // 如果不设置，那么即使viewpager在只有一个页面时不能滑动，但是还是会触发onPageScrolled、onPageScrollStateChanged方法
+                // 如果不设置，那么即使viewpager在只有一个页面时不能滑动，但是触摸还是会触发onPageScrolled、onPageScrollStateChanged方法
                 mViewPager2.isUserInputEnabled = false
                 mViewPager2.setCurrentItem(0, false)
             }
             newData.size > 1 -> {
                 mViewPager2.isUserInputEnabled = true
-                mViewPager2.setCurrentItem(1, false)
+                val initPosition = if (newData == oldData) {// 但在 RecyclerView 中进行复用时，保持原位置不变。
+                    oldPosition
+                } else {
+                    1
+                }
+                mViewPager2.setCurrentItem(initPosition, false)
                 play()
             }
         }
