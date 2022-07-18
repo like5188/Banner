@@ -73,20 +73,6 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
             offscreenPageLimit = 1
             val callback = object : ViewPager2.OnPageChangeCallback() {
-                // 获取真实位置，即没有添加首尾辅助数据时的位置。
-                private fun getRealPosition(position: Int): Int {
-                    val totalCount = (mViewPager2.adapter as ListAdapter<*, *>).currentList.size
-                    return if (totalCount > 1) {
-                        when (position) {
-                            0 -> totalCount - 3
-                            totalCount - 1 -> 0
-                            else -> position - 1
-                        }
-                    } else {
-                        position
-                    }
-                }
-
                 // position当前选择的是哪个页面。注意：如果mCount=1，那么默认会显示第0页，此时不会触发此方法，只会触发onPageScrolled方法。
                 override fun onPageSelected(position: Int) {
                     mOnPageChangeCallback?.onPageSelected(getRealPosition(position))
@@ -119,6 +105,20 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
             registerOnPageChangeCallback(callback)
         }
         this.addView(mViewPager2)
+    }
+
+    // 获取真实位置，即没有添加首尾辅助数据时的位置。
+    private fun getRealPosition(position: Int): Int {
+        val totalCount = (mViewPager2.adapter as ListAdapter<*, *>).currentList.size
+        return if (totalCount > 1) {
+            when (position) {
+                0 -> totalCount - 3
+                totalCount - 1 -> 0
+                else -> position - 1
+            }
+        } else {
+            position
+        }
     }
 
     fun setOnPageChangeCallback(callback: OnPageChangeCallback?) {
@@ -164,12 +164,14 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
             }
             newData.size > 1 -> {
                 mViewPager2.isUserInputEnabled = true
-                val initPosition = if (newData == oldData) {// 但在 RecyclerView 中进行复用时，保持原位置不变。
-                    oldPosition
+                if (newData == oldData) {// 但在 RecyclerView 中进行复用时，保持原位置不变。
+                    mViewPager2.setCurrentItem(oldPosition, false)
+                    val realPosition = getRealPosition(oldPosition)
+                    mOnPageChangeCallback?.onPageSelected(realPosition)
+                    mOnPageChangeCallback?.onPageScrolled(realPosition, 0f, 0)
                 } else {
-                    1
+                    mViewPager2.setCurrentItem(1, false)
                 }
-                mViewPager2.setCurrentItem(initPosition, false)
                 play()
             }
         }
