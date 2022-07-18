@@ -246,10 +246,17 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
      * @param duration 默认300毫秒
      */
     fun setScrollSpeed(duration: Int = 300, interpolator: Interpolator = AccelerateInterpolator()) {
+        setScroller(FixedSpeedScroller(context, interpolator, duration))
+    }
+
+    /**
+     * 设置 Scroller
+     */
+    fun setScroller(scroller: Scroller) {
         try {
             val field = ViewPager::class.java.getDeclaredField("mScroller")
             field.isAccessible = true
-            field.set(this, FixedSpeedScroller(context, interpolator, duration))
+            field.set(this, scroller)
         } catch (e: Exception) {
             e.printStackTrace()
         }
