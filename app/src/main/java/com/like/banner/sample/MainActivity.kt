@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2
 import com.like.banner.indicator.ImageIndicator
 import com.like.banner.sample.databinding.ActivityMainBinding
 import com.like.common.util.Logger
@@ -101,7 +102,19 @@ class MainActivity : AppCompatActivity() {
                     listOf(R.drawable.dot_unselected),
                     listOf(R.drawable.dot_selected)
                 )
-                mBinding.viewBanner.banner.setBannerIndicator(indicator)
+                mBinding.viewBanner.banner.setOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                    override fun onPageSelected(position: Int) {
+                        indicator.onPageSelected(position)
+                    }
+
+                    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                        indicator.onPageScrolled(position, positionOffset, positionOffsetPixels)
+                    }
+
+                    override fun onPageScrollStateChanged(state: Int) {
+                        indicator.onPageScrollStateChanged(state)
+                    }
+                })
                 mBinding.viewBanner.banner.submitList(bannerList)
             }
     }

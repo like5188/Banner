@@ -13,8 +13,8 @@ import android.widget.Scroller
 import androidx.recyclerview.widget.ListAdapter
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
+import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.like.banner.Banner.Companion.mAutoLoop
-import com.like.banner.indicator.IBannerIndicator
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -39,11 +39,7 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
     private var mRunning = AtomicBoolean(false)// 是否正在轮播
     private var mVisible = false// ViewPager是否可见
     private var mUserPresent = true// 手机屏幕对用户是否可见
-
-    /**
-     * 指示器
-     */
-    private var mBannerIndicator: IBannerIndicator? = null
+    private var mOnPageChangeCallback: OnPageChangeCallback? = null
 
     private val mScrollRunnable: Runnable = object : Runnable {
         override fun run() {
@@ -64,49 +60,6 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
             }
         }
     }
-    private val mOnPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
-        fun getIndicatorPosition(position: Int): Int {
-            val totalCount = (mViewPager2.adapter as ListAdapter<*, *>).currentList.size
-            return if (totalCount > 1) {
-                when (position) {
-                    0 -> totalCount - 3
-                    totalCount - 1 -> 0
-                    else -> position - 1
-                }
-            } else {
-                position
-            }
-        }
-
-        // position当前选择的是哪个页面。注意：如果mCount=1，那么默认会显示第0页，此时不会触发此方法，只会触发onPageScrolled方法。
-        override fun onPageSelected(position: Int) {
-            mBannerIndicator?.onPageSelected(getIndicatorPosition(position))
-        }
-
-        // position表示目标位置，positionOffset表示偏移的百分比，positionOffsetPixels表示偏移的像素
-        override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-            mBannerIndicator?.onPageScrolled(getIndicatorPosition(position), positionOffset, positionOffsetPixels)
-        }
-
-        override fun onPageScrollStateChanged(state: Int) {
-            when (state) {
-                ViewPager2.SCROLL_STATE_IDLE -> {// 页面停止在了某页，有可能是手指滑动一页结束，有可能是自动滑动一页结束，开始自动播放。
-                    val totalCount = (mViewPager2.adapter as ListAdapter<*, *>).currentList.size
-                    when (mViewPager2.currentItem) {
-                        totalCount - 1 -> mViewPager2.setCurrentItem(1, false)
-                        0 -> mViewPager2.setCurrentItem(totalCount - 2, false)
-                    }
-                    play()
-                }
-                ViewPager2.SCROLL_STATE_DRAGGING -> {// 手指按下开始滑动，停止自动播放。
-                    stop()
-                }
-                ViewPager2.SCROLL_STATE_SETTLING -> {// 页面开始自动滑动
-                }
-            }
-            mBannerIndicator?.onPageScrollStateChanged(state)
-        }
-    }
 
     init {
         val a = context.obtainStyledAttributes(attrs, R.styleable.BannerViewPager)
@@ -118,14 +71,58 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
         a.recycle()
         mViewPager2 = ViewPager2(context, attrs).apply {
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
-            registerOnPageChangeCallback(mOnPageChangeCallback)
-            // 必须设置这个，否则在使用setPageTransformer()并配合android:clipChildren="false"来使用时，
-            // 会发现由于没有缓存，导致每次都要初始化下一页，从而使得下一页的页面每次都是初始状态，不能达到setPageTransformer()的效果。
-            // 如果有缓存的话，那么setPageTransformer()的动画效果就会作用于缓存的页面，从而正确显示效果。
             offscreenPageLimit = 1
-            this@Banner.addView(this)
-        }
+            val callback = object : ViewPager2.OnPageChangeCallback() {
+                // 获取真实位置，即没有添加首尾辅助数据时的位置。
+                private fun getRealPosition(position: Int): Int {
+                    val totalCount = (mViewPager2.adapter as ListAdapter<*, *>).currentList.size
+                    return if (totalCount > 1) {
+                        when (position) {
+                            0 -> totalCount - 3
+                            totalCount - 1 -> 0
+                            else -> position - 1
+                        }
+                    } else {
+                        position
+                    }
+                }
 
+                // position当前选择的是哪个页面。注意：如果mCount=1，那么默认会显示第0页，此时不会触发此方法，只会触发onPageScrolled方法。
+                override fun onPageSelected(position: Int) {
+                    mOnPageChangeCallback?.onPageSelected(getRealPosition(position))
+                }
+
+                // position表示目标位置，positionOffset表示偏移的百分比，positionOffsetPixels表示偏移的像素
+                override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                    mOnPageChangeCallback?.onPageScrolled(getRealPosition(position), positionOffset, positionOffsetPixels)
+                }
+
+                override fun onPageScrollStateChanged(state: Int) {
+                    when (state) {
+                        ViewPager2.SCROLL_STATE_IDLE -> {// 页面停止在了某页，有可能是手指滑动一页结束，有可能是自动滑动一页结束，开始自动播放。
+                            val totalCount = (mViewPager2.adapter as ListAdapter<*, *>).currentList.size
+                            when (mViewPager2.currentItem) {
+                                totalCount - 1 -> mViewPager2.setCurrentItem(1, false)
+                                0 -> mViewPager2.setCurrentItem(totalCount - 2, false)
+                            }
+                            play()
+                        }
+                        ViewPager2.SCROLL_STATE_DRAGGING -> {// 手指按下开始滑动，停止自动播放。
+                            stop()
+                        }
+                        ViewPager2.SCROLL_STATE_SETTLING -> {// 页面开始自动滑动
+                        }
+                    }
+                    mOnPageChangeCallback?.onPageScrollStateChanged(state)
+                }
+            }
+            registerOnPageChangeCallback(callback)
+        }
+        this.addView(mViewPager2)
+    }
+
+    fun setOnPageChangeCallback(callback: OnPageChangeCallback?) {
+        this.mOnPageChangeCallback = callback
     }
 
     /**
@@ -133,18 +130,6 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
      */
     fun setAdapter(adapter: ListAdapter<*, *>) {
         mViewPager2.adapter = adapter
-    }
-
-    /**
-     * 设置指示器。
-     * 库里默认实现了四种指示器：
-     * [com.like.banner.indicator.ImageIndicator]、
-     * [com.like.banner.indicator.StickyDotBezierCurveIndicator]、
-     * [com.like.banner.indicator.StickyRoundRectIndicator]、
-     * [com.like.banner.indicator.CircleTextIndicator]
-     */
-    fun setBannerIndicator(bannerIndicator: IBannerIndicator) {
-        mBannerIndicator = bannerIndicator
     }
 
     fun <T> submitList(list: List<T>?, commitCallback: Runnable? = null) {

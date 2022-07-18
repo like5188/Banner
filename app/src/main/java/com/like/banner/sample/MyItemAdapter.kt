@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
+import androidx.viewpager2.widget.ViewPager2
 import com.like.banner.indicator.*
 import com.like.banner.sample.databinding.ViewBannerBinding
 import com.like.common.util.dp
@@ -50,7 +51,19 @@ class MyItemAdapter : BaseListAdapter<ViewDataBinding, IRecyclerViewItem>(
 //        binding.banner.pageMargin = 10.dp
 //        binding.banner.setPageTransformer(true, CascadingPageTransformer())
         val indicator: StickyRoundRectIndicator = createBannerIndicator(context, item.bannerList.size, binding.indicatorContainer)
-        binding.banner.setBannerIndicator(indicator)
+        binding.banner.setOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                indicator.onPageSelected(position)
+            }
+
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                indicator.onPageScrolled(position, positionOffset, positionOffsetPixels)
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {
+                indicator.onPageScrollStateChanged(state)
+            }
+        })
         binding.banner.submitList(item.bannerList)
     }
 
