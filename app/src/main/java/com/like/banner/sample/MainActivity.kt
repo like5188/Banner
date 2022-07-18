@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initList()
+        initSingleBannerView()
     }
 
     private fun initSingleBannerView() {
@@ -92,33 +92,35 @@ class MainActivity : AppCompatActivity() {
             }
             .flowOn(Dispatchers.Main)
             .collect {
-                mBinding.viewBanner.banner.setAdapter(MyBannerAdapter())
                 val bannerList = it?.bannerList ?: emptyList()
-                val indicator = ImageIndicator(
-                    this,
-                    bannerList.size,
-                    mBinding.viewBanner.indicatorContainer,
-                    10.dp,
-                    listOf(R.drawable.dot_unselected),
-                    listOf(R.drawable.dot_selected)
-                )
-                mBinding.viewBanner.banner.setOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-                    override fun onPageSelected(position: Int) {
-                        Logger.d("onPageSelected position=$position")
-                        indicator.onPageSelected(position)
-                    }
+                if (mBinding.viewBanner.banner.needBindViewHolder(bannerList, MyBannerAdapter.DIFF)) {
+                    mBinding.viewBanner.banner.setAdapter(MyBannerAdapter())
+                    val indicator = ImageIndicator(
+                        this,
+                        bannerList.size,
+                        mBinding.viewBanner.indicatorContainer,
+                        10.dp,
+                        listOf(R.drawable.dot_unselected),
+                        listOf(R.drawable.dot_selected)
+                    )
+                    mBinding.viewBanner.banner.setOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                        override fun onPageSelected(position: Int) {
+                            Logger.d("onPageSelected position=$position")
+                            indicator.onPageSelected(position)
+                        }
 
-                    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-                        Logger.v("onPageScrolled position=$position positionOffset=$positionOffset positionOffsetPixels=$positionOffsetPixels")
-                        indicator.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                    }
+                        override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                            Logger.v("onPageScrolled position=$position positionOffset=$positionOffset positionOffsetPixels=$positionOffsetPixels")
+                            indicator.onPageScrolled(position, positionOffset, positionOffsetPixels)
+                        }
 
-                    override fun onPageScrollStateChanged(state: Int) {
-                        Logger.i("onPageScrollStateChanged state=$state")
-                        indicator.onPageScrollStateChanged(state)
-                    }
-                })
-                mBinding.viewBanner.banner.submitList(bannerList)
+                        override fun onPageScrollStateChanged(state: Int) {
+                            Logger.i("onPageScrollStateChanged state=$state")
+                            indicator.onPageScrollStateChanged(state)
+                        }
+                    })
+                    mBinding.viewBanner.banner.submitList(bannerList)
+                }
             }
     }
 
