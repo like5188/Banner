@@ -16,11 +16,6 @@ fun <T> ViewPager2.needBindViewHolder(newData: List<T>, diffCallback: DiffUtil.I
         return true
     }
     val oldData = (adapter as? ListAdapter<T, *>)?.currentList?.toMutableList()
-    if (oldData != null && oldData.size > 1) {
-        // 去掉首尾辅助数据
-        oldData.removeLast()
-        oldData.removeFirst()
-    }
     if (oldData?.size != newData.size) {
         return true
     }
