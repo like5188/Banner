@@ -13,12 +13,22 @@ import android.widget.FrameLayout
 import android.widget.Scroller
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
+import com.like.banner.Banner.Companion.mAutoLoop
 import com.like.banner.indicator.IBannerIndicator
 import java.util.concurrent.atomic.AtomicBoolean
 
+/**
+ * 对[ViewPager2]进行了封装，使其支持无限滚动轮播图，必须配合[BannerAdapter]使用。
+ * 自动轮播功能是仿照[android.widget.ViewFlipper]来实现的。
+ *
+ * 自定义的属性包括：
+ * @attr ref android.R.styleable#BannerViewPager_cycle_interval     [mCycleInterval]
+ * 循环的时间间隔，毫秒。默认3000，如果小于等于0，也会设置为默认值3000
+ * @attr ref android.R.styleable#BannerViewPager_auto_loop          [mAutoLoop]
+ * 是否开启自动无限轮播
+ */
 open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs) {
     companion object {
-        private const val DEFAULT_HEIGHT_WIDTH_RATIO = 0f
         private const val DEFAULT_CIRCLE_INTERVAL = 3000
         private const val DEFAULT_AUTO_LOOP = true
         internal const val MAX_COUNT = 10000// 注意：设置太大了会在 setCurrentItem 造成 ANR，但是不知道为什么，在 RecyclerView 中使用时又不会卡。
@@ -26,7 +36,6 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
     }
 
     private lateinit var mViewPager2: ViewPager2
-    private var mHeightWidthRatio = DEFAULT_HEIGHT_WIDTH_RATIO
     private var mCycleInterval: Int = DEFAULT_CIRCLE_INTERVAL
     private var mRunning = AtomicBoolean(false)// 是否正在轮播
     private var mVisible = false// ViewPager是否可见
@@ -110,7 +119,6 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
 
     init {
         val a = context.obtainStyledAttributes(attrs, R.styleable.BannerViewPager)
-        mHeightWidthRatio = a.getFloat(R.styleable.BannerViewPager_height_width_ratio, DEFAULT_HEIGHT_WIDTH_RATIO)
         mCycleInterval = a.getInt(R.styleable.BannerViewPager_cycle_interval, DEFAULT_CIRCLE_INTERVAL)
         mAutoLoop = a.getBoolean(R.styleable.BannerViewPager_auto_loop, DEFAULT_AUTO_LOOP)
         if (mCycleInterval <= 0) {
@@ -202,19 +210,6 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
         if (mRunning.compareAndSet(true, false)) {
             removeCallbacks(mScrollRunnable)
         }
-    }
-
-    final override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        var hms = heightMeasureSpec
-        if (mHeightWidthRatio > 0f) {
-            val widthMode = MeasureSpec.getMode(widthMeasureSpec)
-            val widthSize = MeasureSpec.getSize(widthMeasureSpec)
-            if (widthMode == MeasureSpec.EXACTLY) {
-                val heightSize = (widthSize * mHeightWidthRatio).toInt()
-                hms = MeasureSpec.makeMeasureSpec(heightSize, MeasureSpec.EXACTLY)
-            }
-        }
-        super.onMeasure(widthMeasureSpec, hms)
     }
 
     final override fun onTouchEvent(ev: MotionEvent): Boolean {
