@@ -10,6 +10,7 @@ import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import com.like.banner.indicator.*
 import com.like.banner.sample.databinding.ViewBannerBinding
+import com.like.banner.transformer.AlphaAndScalePageTransformer
 import com.like.common.util.Logger
 import com.like.common.util.dp
 import com.like.recyclerview.adapter.BaseListAdapter
@@ -54,7 +55,7 @@ class MyItemAdapter : BaseListAdapter<ViewDataBinding, IRecyclerViewItem>(
             binding.banner.setScrollSpeed()
             CompositePageTransformer().apply {
                 addTransformer(MarginPageTransformer(10.dp))
-                addTransformer(AlphaPageTransformer())
+                addTransformer(AlphaAndScalePageTransformer())
                 binding.banner.setPageTransformer(this)
             }
             val indicator: StickyRoundRectIndicator = createBannerIndicator(context, item.bannerList.size, binding.indicatorContainer)
