@@ -195,6 +195,10 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
         }
     }
 
+    fun setPageTransformer(transformer: ViewPager2.PageTransformer?) {
+        mViewPager2.setPageTransformer(transformer)
+    }
+
     // 注意：如果不是在 RecyclerView 中使用的话，那么调用此方法的时候还没有 setAdapter，那么就不会触发自动轮播，因为 mScrollable 为 false
     final override fun onAttachedToWindow() {
         super.onAttachedToWindow()

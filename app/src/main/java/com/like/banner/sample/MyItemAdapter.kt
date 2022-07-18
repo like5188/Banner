@@ -5,6 +5,8 @@ import android.graphics.Color
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
+import androidx.viewpager2.widget.CompositePageTransformer
+import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import com.like.banner.indicator.*
 import com.like.banner.sample.databinding.ViewBannerBinding
@@ -50,8 +52,11 @@ class MyItemAdapter : BaseListAdapter<ViewDataBinding, IRecyclerViewItem>(
             val context = holder.itemView.context
             binding.banner.setAdapter(MyBannerAdapter())
             binding.banner.setScrollSpeed()
-//        binding.banner.pageMargin = 10.dp
-//        binding.banner.setPageTransformer(true, CascadingPageTransformer())
+            CompositePageTransformer().apply {
+                addTransformer(MarginPageTransformer(10.dp))
+                addTransformer(AlphaPageTransformer())
+                binding.banner.setPageTransformer(this)
+            }
             val indicator: StickyRoundRectIndicator = createBannerIndicator(context, item.bannerList.size, binding.indicatorContainer)
             binding.banner.setOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
