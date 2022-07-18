@@ -141,7 +141,6 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
      * 注意：此方法必须放在最后调用，否则刷新时会造成 Indicator 位置显示错乱。
      */
     fun setAdapter(adapter: BannerAdapter<*, *>) {
-        require(adapter is BannerAdapter) { "adapter of viewPager must be com.like.banner.BannerAdapter" }
         val oldData = (mViewPager2.adapter as? BannerAdapter<*, *>)?.currentList
         mViewPager2.adapter = adapter
         stop()
