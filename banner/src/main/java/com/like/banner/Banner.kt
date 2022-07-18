@@ -129,9 +129,22 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
      * 注意：此方法只能设置一次 adapter
      */
     fun setAdapter(adapter: ListAdapter<*, *>) {
-        if (mViewPager2.adapter == null) {
-            mViewPager2.adapter = adapter
+        mViewPager2.adapter = adapter
+    }
+
+    /**
+     * 是否需要 bindViewHolder
+     * 1、没有设置adapter。
+     * 2、新旧数据不相同。（注意数据需要重写equals）
+     */
+    fun needBindViewHolder(newData: List<*>): Boolean {
+        val oldData = (mViewPager2.adapter as? ListAdapter<*, *>)?.currentList?.toMutableList()
+        if (oldData != null && oldData.size > 1) {
+            // 去掉首尾辅助数据
+            oldData.removeLast()
+            oldData.removeFirst()
         }
+        return mViewPager2.adapter == null || oldData != newData
     }
 
     fun <T> submitList(list: List<T>?, commitCallback: Runnable? = null) {
@@ -141,9 +154,6 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
             listAdapter.submitList(null, commitCallback)
             return
         }
-
-        val oldPosition = mViewPager2.currentItem
-        val oldData = listAdapter.currentList.toList()
 
         val newData = mutableListOf<T>()
         if (list.size > 1) {// 超过1条数据，就在首尾各加一条数据
@@ -164,14 +174,7 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
             }
             newData.size > 1 -> {
                 mViewPager2.isUserInputEnabled = true
-                if (newData == oldData) {// 但在 RecyclerView 中进行复用时，保持原位置不变。
-                    mViewPager2.setCurrentItem(oldPosition, false)
-                    val realPosition = getRealPosition(oldPosition)
-                    mOnPageChangeCallback?.onPageSelected(realPosition)
-                    mOnPageChangeCallback?.onPageScrolled(realPosition, 0f, 0)
-                } else {
-                    mViewPager2.setCurrentItem(1, false)
-                }
+                mViewPager2.setCurrentItem(1, false)
                 play()
             }
         }

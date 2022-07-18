@@ -46,29 +46,31 @@ class MyItemAdapter : BaseListAdapter<ViewDataBinding, IRecyclerViewItem>(
         if (item !is BannerInfo) {
             return
         }
-        val context = holder.itemView.context
-        binding.banner.setAdapter(MyBannerAdapter())
-        binding.banner.setScrollSpeed()
+        if (binding.banner.needBindViewHolder(item.bannerList)) {
+            val context = holder.itemView.context
+            binding.banner.setAdapter(MyBannerAdapter())
+            binding.banner.setScrollSpeed()
 //        binding.banner.pageMargin = 10.dp
 //        binding.banner.setPageTransformer(true, CascadingPageTransformer())
-        val indicator: StickyRoundRectIndicator = createBannerIndicator(context, item.bannerList.size, binding.indicatorContainer)
-        binding.banner.setOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                Logger.d("onPageSelected position=$position")
-                indicator.onPageSelected(position)
-            }
+            val indicator: StickyRoundRectIndicator = createBannerIndicator(context, item.bannerList.size, binding.indicatorContainer)
+            binding.banner.setOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    Logger.d("onPageSelected position=$position")
+                    indicator.onPageSelected(position)
+                }
 
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-                Logger.v("onPageScrolled position=$position positionOffset=$positionOffset positionOffsetPixels=$positionOffsetPixels")
-                indicator.onPageScrolled(position, positionOffset, positionOffsetPixels)
-            }
+                override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                    Logger.v("onPageScrolled position=$position positionOffset=$positionOffset positionOffsetPixels=$positionOffsetPixels")
+                    indicator.onPageScrolled(position, positionOffset, positionOffsetPixels)
+                }
 
-            override fun onPageScrollStateChanged(state: Int) {
-                Logger.i("onPageScrollStateChanged state=$state")
-                indicator.onPageScrollStateChanged(state)
-            }
-        })
-        binding.banner.submitList(item.bannerList)
+                override fun onPageScrollStateChanged(state: Int) {
+                    Logger.i("onPageScrollStateChanged state=$state")
+                    indicator.onPageScrollStateChanged(state)
+                }
+            })
+            binding.banner.submitList(item.bannerList)
+        }
     }
 
     private inline fun <reified T : IBannerIndicator> createBannerIndicator(context: Context, mDataCount: Int, mContainer: ViewGroup): T =
