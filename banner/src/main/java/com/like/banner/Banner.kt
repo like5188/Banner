@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import com.like.banner.Banner.Companion.mAutoLoop
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -25,14 +24,10 @@ import java.util.concurrent.atomic.AtomicBoolean
  * 自定义的属性包括：
  * @attr ref android.R.styleable#BannerViewPager_cycle_interval     [mCycleInterval]
  * 循环的时间间隔，毫秒。默认3000，如果小于等于0，也会设置为默认值3000
- * @attr ref android.R.styleable#BannerViewPager_auto_loop          [mAutoLoop]
- * 是否开启自动无限轮播
  */
 open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs) {
     companion object {
         private const val DEFAULT_CIRCLE_INTERVAL = 3000
-        private const val DEFAULT_AUTO_LOOP = true
-        internal var mAutoLoop: Boolean = DEFAULT_AUTO_LOOP
     }
 
     private lateinit var mViewPager2: ViewPager2
@@ -65,7 +60,6 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
     init {
         val a = context.obtainStyledAttributes(attrs, R.styleable.BannerViewPager)
         mCycleInterval = a.getInt(R.styleable.BannerViewPager_cycle_interval, DEFAULT_CIRCLE_INTERVAL)
-        mAutoLoop = a.getBoolean(R.styleable.BannerViewPager_auto_loop, DEFAULT_AUTO_LOOP)
         if (mCycleInterval <= 0) {
             mCycleInterval = DEFAULT_CIRCLE_INTERVAL
         }
@@ -231,7 +225,7 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
      * 开始轮播
      */
     private fun play() {
-        if (mVisible && mUserPresent && mAutoLoop && mViewPager2.isUserInputEnabled) {
+        if (mVisible && mUserPresent && mViewPager2.isUserInputEnabled) {
             if (mRunning.compareAndSet(false, true)) {
                 // 因为页面变化，所以setCurrentItem方法能触发onPageSelected、onPageScrolled方法，
                 // 但是不能触发 onPageScrollStateChanged，所以不会启动自动播放，由使用者手动开启自动播放

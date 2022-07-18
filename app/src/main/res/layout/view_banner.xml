@@ -14,7 +14,6 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:clipChildren="false"
-            app:auto_loop="true"
             app:cycle_interval="3000"
             app:layout_constraintDimensionRatio="h,5:2"
             app:layout_constraintEnd_toEndOf="parent"

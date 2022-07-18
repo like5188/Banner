@@ -3,6 +3,5 @@
 
     <declare-styleable name="BannerViewPager">
         <attr name="cycle_interval" format="integer" />
-        <attr name="auto_loop" format="boolean" />
     </declare-styleable>
 </resources>
