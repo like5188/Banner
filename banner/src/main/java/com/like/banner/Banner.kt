@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.AttributeSet
-import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.Interpolator
@@ -40,7 +39,6 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
     private var mRunning = AtomicBoolean(false)// 是否正在轮播
     private var mVisible = false// ViewPager是否可见
     private var mUserPresent = true// 手机屏幕对用户是否可见
-    private var mScrollable = false// 是否可以滚动
 
     /**
      * 真实的数据条数
@@ -148,11 +146,12 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
         mRealCount = adapter.currentList.size
         when {
             mRealCount == 1 -> { // 如果只有一个页面，就限制 ViewPager 不能手动滑动
-                mScrollable = false// 如果不设置，那么即使viewpager在只有一个页面时不能滑动，但是还是会触发onPageScrolled、onPageScrollStateChanged方法
+                // 如果不设置，那么即使viewpager在只有一个页面时不能滑动，但是还是会触发onPageScrolled、onPageScrollStateChanged方法
+                mViewPager2.isUserInputEnabled = false
                 mViewPager2.setCurrentItem(0, false)
             }
             mRealCount > 1 -> {
-                mScrollable = true
+                mViewPager2.isUserInputEnabled = true
                 if (adapter.currentList != oldData) {
                     // 取余处理，避免默认值不能被 mDataCount 整除，从而不能让初始时在第0个位置。
                     mCurPosition = if (mAutoLoop) {
@@ -197,7 +196,7 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
      * 开始轮播
      */
     private fun play() {
-        if (mVisible && mUserPresent && mScrollable && mAutoLoop) {
+        if (mVisible && mUserPresent && mAutoLoop && mViewPager2.isUserInputEnabled) {
             if (mRunning.compareAndSet(false, true)) {
                 // 因为页面变化，所以setCurrentItem方法能触发onPageSelected、onPageScrolled方法，
                 // 但是不能触发 onPageScrollStateChanged，所以不会启动自动播放，由使用者手动开启自动播放
@@ -210,14 +209,6 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
         if (mRunning.compareAndSet(true, false)) {
             removeCallbacks(mScrollRunnable)
         }
-    }
-
-    final override fun onTouchEvent(ev: MotionEvent): Boolean {
-        return mScrollable && super.onTouchEvent(ev)
-    }
-
-    final override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
-        return mScrollable && super.onInterceptTouchEvent(ev)
     }
 
     /**
