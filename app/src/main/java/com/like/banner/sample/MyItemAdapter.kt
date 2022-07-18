@@ -46,7 +46,7 @@ class MyItemAdapter : BaseListAdapter<ViewDataBinding, IRecyclerViewItem>(
         if (item !is BannerInfo) {
             return
         }
-        if (binding.banner.needBindViewHolder(item.bannerList)) {
+        if (binding.banner.needBindViewHolder(item.bannerList, MyBannerAdapter.DIFF)) {
             val context = holder.itemView.context
             binding.banner.setAdapter(MyBannerAdapter())
             binding.banner.setScrollSpeed()

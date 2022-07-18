@@ -10,6 +10,7 @@ import android.view.animation.AccelerateInterpolator
 import android.view.animation.Interpolator
 import android.widget.FrameLayout
 import android.widget.Scroller
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
@@ -135,16 +136,30 @@ open class Banner(context: Context, attrs: AttributeSet?) : FrameLayout(context,
     /**
      * 是否需要 bindViewHolder
      * 1、没有设置adapter。
-     * 2、新旧数据不相同。（注意数据需要重写equals）
+     * 2、新旧数据不相同。
      */
-    fun needBindViewHolder(newData: List<*>): Boolean {
-        val oldData = (mViewPager2.adapter as? ListAdapter<*, *>)?.currentList?.toMutableList()
+    fun <T> needBindViewHolder(newData: List<T>, diffCallback: DiffUtil.ItemCallback<T>): Boolean {
+        if (mViewPager2.adapter == null) {
+            return true
+        }
+        val oldData = (mViewPager2.adapter as? ListAdapter<T, *>)?.currentList?.toMutableList()
         if (oldData != null && oldData.size > 1) {
             // 去掉首尾辅助数据
             oldData.removeLast()
             oldData.removeFirst()
         }
-        return mViewPager2.adapter == null || oldData != newData
+        if (oldData?.size != newData.size) {
+            return true
+        }
+        oldData.forEachIndexed { index, t ->
+            if (!diffCallback.areItemsTheSame(t, newData[index])) {
+                return true
+            }
+            if (!diffCallback.areContentsTheSame(t, newData[index])) {
+                return true
+            }
+        }
+        return false
     }
 
     fun <T> submitList(list: List<T>?, commitCallback: Runnable? = null) {
