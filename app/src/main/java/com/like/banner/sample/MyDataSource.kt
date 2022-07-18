@@ -8,6 +8,7 @@ import kotlinx.coroutines.delay
 
 class MyDataSource : PageNoKeyedPagingDataSource<List<IRecyclerViewItem>?>(0, 10) {
     private var i = 0
+    private val bannerDataSource = BannerDataSource()
 
     override suspend fun load(requestType: RequestType, pageNo: Int, pageSize: Int): List<IRecyclerViewItem>? {
         if (requestType is RequestType.Initial || requestType is RequestType.Refresh) {
@@ -16,7 +17,7 @@ class MyDataSource : PageNoKeyedPagingDataSource<List<IRecyclerViewItem>?>(0, 10
         return if (i++ == 0) {
             val result = mutableListOf<IRecyclerViewItem>()
             successIfAllSuccess({
-                val bannerInfo = BannerDataSource().load()
+                val bannerInfo = bannerDataSource.load()
                 if (bannerInfo != null) {
                     listOf(bannerInfo)
                 } else {
