@@ -104,14 +104,17 @@ class MainActivity : AppCompatActivity() {
                 )
                 mBinding.viewBanner.banner.setOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                     override fun onPageSelected(position: Int) {
+                        Logger.d("onPageSelected position=$position")
                         indicator.onPageSelected(position)
                     }
 
                     override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                        Logger.v("onPageScrolled position=$position positionOffset=$positionOffset positionOffsetPixels=$positionOffsetPixels")
                         indicator.onPageScrolled(position, positionOffset, positionOffsetPixels)
                     }
 
                     override fun onPageScrollStateChanged(state: Int) {
+                        Logger.i("onPageScrollStateChanged state=$state")
                         indicator.onPageScrollStateChanged(state)
                     }
                 })

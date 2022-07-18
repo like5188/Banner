@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.viewpager2.widget.ViewPager2
 import com.like.banner.indicator.*
 import com.like.banner.sample.databinding.ViewBannerBinding
+import com.like.common.util.Logger
 import com.like.common.util.dp
 import com.like.recyclerview.adapter.BaseListAdapter
 import com.like.recyclerview.model.IRecyclerViewItem
@@ -53,14 +54,17 @@ class MyItemAdapter : BaseListAdapter<ViewDataBinding, IRecyclerViewItem>(
         val indicator: StickyRoundRectIndicator = createBannerIndicator(context, item.bannerList.size, binding.indicatorContainer)
         binding.banner.setOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
+                Logger.d("onPageSelected position=$position")
                 indicator.onPageSelected(position)
             }
 
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                Logger.v("onPageScrolled position=$position positionOffset=$positionOffset positionOffsetPixels=$positionOffsetPixels")
                 indicator.onPageScrolled(position, positionOffset, positionOffsetPixels)
             }
 
             override fun onPageScrollStateChanged(state: Int) {
+                Logger.i("onPageScrollStateChanged state=$state")
                 indicator.onPageScrollStateChanged(state)
             }
         })
